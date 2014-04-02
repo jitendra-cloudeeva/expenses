@@ -40,6 +40,15 @@
 
 -(void)CreateControls
 {
+    self.view.backgroundColor = [UIColor colorWithRed:165/255.0f green:217/255.0f blue:235/255.0f alpha:1.0f];
+    
+    travelTypes = [[NSMutableArray alloc] init];
+    [travelTypes addObject:@"Travel"];
+    [travelTypes addObject:@"Food"];
+    [travelTypes addObject:@"Ticket"];
+    [travelTypes addObject:@"Stationary"];
+    [travelTypes addObject:@"Hotel"];
+    
     UIImageView *picture = [[UIImageView alloc] initWithFrame:CGRectMake(15, 80, 90, 90)];
     picture.image = [UIImage imageNamed:@"jitu.png"];
     [self.view addSubview:picture];
@@ -93,12 +102,29 @@
 	label.text = @"Expense Submission Date: ";
     [self.view addSubview:label];
     
-    label = [[UILabel alloc] initWithFrame:CGRectMake(195, 180, 180, 30)];
+    txtDOB = [[UITextField alloc] initWithFrame:CGRectMake(195, 180, 115, 30)];
+	txtDOB.font = [UIFont systemFontOfSize:15];
+    txtDOB.tag = 1;
+    txtDOB.autocorrectionType = UITextAutocorrectionTypeNo;
+    txtDOB.placeholder = @" Date of birth*";
+    txtDOB.delegate = self;
+	txtDOB.textColor = [UIColor blackColor];
+	txtDOB.text = @"";
+    txtDOB.borderStyle = UITextBorderStyleLine;
+    txtDOB.backgroundColor = [UIColor whiteColor];
+    txtDOB.layer.borderColor=[[UIColor lightGrayColor]CGColor];
+    txtDOB.layer.borderWidth= 1.0f;
+    [txtDOB addTarget:self action:@selector(textFieldDone:) forControlEvents:UIControlEventEditingDidEndOnExit];
+    txtDOB.keyboardType = UIKeyboardTypeDefault;
+    txtDOB.returnKeyType = UIReturnKeyDone;
+    [self.view addSubview:txtDOB];
+    
+    /*label = [[UILabel alloc] initWithFrame:CGRectMake(195, 180, 180, 30)];
 	label.backgroundColor = [UIColor clearColor];
 	label.font = [UIFont systemFontOfSize:14];
 	label.textColor = [UIColor blackColor];
 	label.text = @"1st April 2014";
-    [self.view addSubview:label];
+    [self.view addSubview:label];*/
     
     label = [[UILabel alloc] initWithFrame:CGRectMake(15, 210, 180, 30)];
 	label.backgroundColor = [UIColor clearColor];
@@ -107,12 +133,24 @@
 	label.text = @"Expense Type: ";
     [self.view addSubview:label];
     
-    label = [[UILabel alloc] initWithFrame:CGRectMake(115, 210, 180, 30)];
+    btnTravelType = [UIButton buttonWithType:UIButtonTypeCustom];
+    [btnTravelType setFrame:CGRectMake(120, 213, 140, 25)];
+    [btnTravelType setTitle:@"select travel type" forState:UIControlStateNormal];
+    [btnTravelType setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+    btnTravelType.titleLabel.font = [UIFont systemFontOfSize:14];
+    [[btnTravelType layer] setBorderWidth:1.0f];
+    [[btnTravelType layer] setBorderColor:[[UIColor lightGrayColor]CGColor]];
+    btnTravelType.contentHorizontalAlignment = UIControlContentHorizontalAlignmentLeft;
+    [btnTravelType setBackgroundImage:[UIImage imageNamed:@"dropdown.png"] forState:UIControlStateNormal];
+    [btnTravelType addTarget:self action:@selector(showTravelTypePicker) forControlEvents:UIControlEventTouchUpInside];
+    [self.view addSubview:btnTravelType];
+    
+    /*label = [[UILabel alloc] initWithFrame:CGRectMake(115, 210, 180, 30)];
 	label.backgroundColor = [UIColor clearColor];
 	label.font = [UIFont systemFontOfSize:14];
 	label.textColor = [UIColor blackColor];
 	label.text = @"Travel";
-    [self.view addSubview:label];
+    [self.view addSubview:label];*/
     
     label = [[UILabel alloc] initWithFrame:CGRectMake(15, 240, 140, 30)];
 	label.backgroundColor = [UIColor clearColor];
@@ -121,9 +159,9 @@
 	label.text = @"Client Name: ";
     [self.view addSubview:label];
     
-    txtClientName = [[UITextField alloc] initWithFrame:CGRectMake(110, 240, 160, 30)];
+    txtClientName = [[UITextField alloc] initWithFrame:CGRectMake(120, 240, 190, 30)];
 	txtClientName.font = [UIFont systemFontOfSize:15];
-    txtClientName.tag = 1;
+    txtClientName.tag = 2;
     txtClientName.text = @"Cloudeeva Inc.";
     txtClientName.textColor = [UIColor blackColor];
 	txtClientName.borderStyle = UITextBorderStyleLine;
@@ -143,7 +181,7 @@
 	label.text = @"Details: ";
     [self.view addSubview:label];
     
-    UITextView *description = [[UITextView alloc] initWithFrame:CGRectMake(110, 275, 160, 50)];
+    UITextView *description = [[UITextView alloc] initWithFrame:CGRectMake(120, 275, 190, 50)];
     description.backgroundColor = [UIColor whiteColor];
     description.layer.borderColor=[[UIColor lightGrayColor]CGColor];
     description.layer.borderWidth= 1.0f;
@@ -164,9 +202,9 @@
 	label.text = @"Amount: ";
     [self.view addSubview:label];
     
-    txtAmount = [[UITextField alloc] initWithFrame:CGRectMake(110, 330, 160, 30)];
+    txtAmount = [[UITextField alloc] initWithFrame:CGRectMake(120, 330, 190, 30)];
 	txtAmount.font = [UIFont systemFontOfSize:15];
-    txtAmount.tag = 2;
+    txtAmount.tag = 3;
     txtAmount.text = @"10,000";
     txtAmount.textColor = [UIColor blackColor];
 	txtAmount.borderStyle = UITextBorderStyleLine;
@@ -174,7 +212,7 @@
     txtAmount.layer.borderColor=[[UIColor lightGrayColor]CGColor];
     txtAmount.layer.borderWidth= 1.0f;
     [txtAmount addTarget:self action:@selector(textFieldDone:) forControlEvents:UIControlEventEditingDidEndOnExit];
-    txtAmount.keyboardType = UIKeyboardTypeDefault;
+    txtAmount.keyboardType = UIKeyboardTypeDecimalPad;
     txtAmount.returnKeyType = UIReturnKeyDone;
     txtAmount.delegate = self;
     [self.view addSubview:txtAmount];
@@ -207,7 +245,7 @@
     
     if(!isSubmitted)
     {
-        UIButton *btnSave = [UIButton buttonWithType:UIButtonTypeCustom];
+        /*UIButton *btnSave = [UIButton buttonWithType:UIButtonTypeCustom];
         btnSave.tag = 1;
         [btnSave setFrame:CGRectMake(115, 443, 240, 30)];
         [btnSave setImage:[UIImage imageNamed:@"save.png"] forState:UIControlStateNormal];
@@ -219,8 +257,188 @@
         btnSubmit.tag = 2;
         [btnSubmit setImage:[UIImage imageNamed:@"submit.png"] forState:UIControlStateNormal];
         [btnSubmit addTarget:self action:@selector(submit) forControlEvents:UIControlEventTouchUpInside];
-        [self.view addSubview:btnSubmit];
+        [self.view addSubview:btnSubmit];*/
+        
+        CGRect frame, remain;
+        CGRectDivide(self.view.bounds, &frame, &remain, 44, CGRectMaxYEdge);
+        UIToolbar *toolbar = [[UIToolbar alloc] initWithFrame:frame];
+        [toolbar setAutoresizingMask:UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleTopMargin];
+        
+        toolbar.items = [NSArray arrayWithObjects:
+                         [[UIBarButtonItem alloc]initWithTitle:@"Submit" style:UIBarButtonItemStyleDone target:self action:@selector(submit)],
+                         [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil],
+                         [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemSave target:self action:@selector(save)],
+                         nil];
+        [toolbar sizeToFit];
+        toolbar.tintColor = [UIColor whiteColor];
+        toolbar.barTintColor = [UIColor colorWithRed:50/255.0f green:134/255.0f blue:221/255.0f alpha:1.0f];//[UIColor colorWithRed:47/255.0f green:177/255.0f blue:241/255.0f alpha:1.0f];
+        
+        [self.view addSubview:toolbar];
     }
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShowNotification:) name:UIKeyboardWillShowNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillHideNotification:) name:UIKeyboardWillHideNotification object:nil];
+}
+
+- (void)viewDidUnload
+{
+    [super viewDidUnload];
+    // Release any retained subviews of the main view.
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillShowNotification object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillHideNotification object:nil];
+}
+
+- (BOOL)textFieldShouldEndEditing:(UITextField *)textField{
+    return YES;
+}
+
+#pragma mark- Keyboard Delegate
+- (void)keyboardWillShowNotification:(NSNotification*)notification{
+    
+}
+
+- (void)keyboardWillHideNotification:(NSNotification*)notification{
+    
+}
+
+- (void)TravelTypePickerDoneClick
+{
+    NSInteger row = [travelTypePickerView selectedRowInComponent:0];
+    [btnTravelType setTitle:[travelTypes objectAtIndex:row] forState:UIControlStateNormal];
+    [aac dismissWithClickedButtonIndex:0 animated:YES];
+}
+
+- (void)DatePickerDoneClick
+{
+    NSDateFormatter *outputFormatter = [[NSDateFormatter alloc] init];
+    [outputFormatter setDateFormat:@"dd-MM-yyyy"];
+    txtDOB.text = [outputFormatter stringFromDate:pickerDate.date];
+    [aac dismissWithClickedButtonIndex:0 animated:YES];
+}
+-(BOOL)textFieldShouldBeginEditing:(UITextField *)textField
+{
+    self.currentKBType = textField.keyboardType;
+    self.curTextField = textField;
+    
+    if(textField.tag == 1)
+    {
+        [textField resignFirstResponder];
+        [self ShowDOBPicker];
+        return NO;
+    }
+    else
+    {
+        UIToolbar* numberToolbar = [[UIToolbar alloc]initWithFrame:CGRectMake(0, 0, 320, 50)];
+        numberToolbar.barStyle = UIBarStyleBlackTranslucent;
+        numberToolbar.items = [NSArray arrayWithObjects:
+                               [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil],
+                               [[UIBarButtonItem alloc]initWithTitle:@"Done" style:UIBarButtonItemStyleDone target:self action:@selector(textFieldDone:)],
+                               nil];
+        [numberToolbar sizeToFit];
+        numberToolbar.barTintColor = [UIColor clearColor];
+        numberToolbar.tintColor = [UIColor colorWithRed:47/255.0f green:177/255.0f blue:241/255.0f alpha:1.0f];
+        textField.inputAccessoryView = numberToolbar;
+    }
+    
+    return YES;
+}
+
+-(void)showTravelTypePicker
+{
+    [self.curTextField resignFirstResponder];
+    
+    aac = [[UIActionSheet alloc] initWithTitle:@"Travel Type" delegate:self cancelButtonTitle:nil destructiveButtonTitle:nil otherButtonTitles:nil];
+    
+    travelTypePickerView = [[UIPickerView alloc] initWithFrame:CGRectMake(0.0, 44.0, 0.0, 0.0)];
+    travelTypePickerView.delegate = self;
+    travelTypePickerView.showsSelectionIndicator = YES;
+    [self.view addSubview:travelTypePickerView];
+    
+    UIToolbar *travelTypePickerToolbar = [[UIToolbar alloc] initWithFrame:CGRectMake(0, 0, 320, 44)];
+    travelTypePickerToolbar.barStyle = UIBarStyleBlackOpaque;
+    [travelTypePickerToolbar sizeToFit];
+    
+    NSMutableArray *barItems = [[NSMutableArray alloc] init];
+    
+    UIBarButtonItem *flexSpace = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:self action:nil];
+    [barItems addObject:flexSpace];
+    
+    UIBarButtonItem *btnCancel = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(TravelTypePickerDoneClick)];
+    [barItems addObject:btnCancel];
+    
+    [travelTypePickerToolbar setItems:barItems animated:YES];
+    
+    [aac addSubview:travelTypePickerToolbar];
+    [aac addSubview:travelTypePickerView];
+    [aac showInView:self.view];
+    [aac setBounds:CGRectMake(0,0,320, 464)];
+}
+
+- (void)pickerView:(UIPickerView *)pickerView didSelectRow: (NSInteger)row inComponent:(NSInteger)component {
+    // Handle the selection
+}
+
+// tell the picker how many rows are available for a given component
+- (NSInteger)pickerView:(UIPickerView *)pickerView numberOfRowsInComponent:(NSInteger)component {
+    
+    
+    return [travelTypes count];
+}
+
+// tell the picker how many components it will have
+- (NSInteger)numberOfComponentsInPickerView:(UIPickerView *)pickerView {
+    return 1;
+}
+
+// tell the picker the title for a given component
+- (NSString *)pickerView:(UIPickerView *)pickerView titleForRow:(NSInteger)row forComponent:(NSInteger)component {
+    NSString *title;
+    title = [travelTypes objectAtIndex:row];
+    
+    return title;
+}
+
+// tell the picker the width of each row for a given component
+- (CGFloat)pickerView:(UIPickerView *)pickerView widthForComponent:(NSInteger)component {
+    return 300;
+}
+
+-(void)ShowDOBPicker
+{
+    [self.curTextField resignFirstResponder];
+    
+    aac = [[UIActionSheet alloc] initWithTitle:@"Date of birth" delegate:self cancelButtonTitle:nil destructiveButtonTitle:nil otherButtonTitles:nil];
+    
+    pickerDate = [[UIDatePicker alloc] initWithFrame:CGRectMake(0.0, 44.0, 0.0, 0.0)];
+    //pickerDate.maximumDate = [NSDate date];
+    if(![APP_DELEGATE IsNullOrEmpty:txtDOB.text])
+    {
+        NSDateFormatter *inputFormatter = [[NSDateFormatter alloc] init];
+        inputFormatter.dateStyle = NSDateFormatterShortStyle;
+        [inputFormatter setDateFormat:@"dd-MM-yyyy"];
+        NSDate *date = [inputFormatter dateFromString:txtDOB.text];
+        pickerDate.date = date;
+    }
+    pickerDate.datePickerMode = UIDatePickerModeDate;
+    
+    UIToolbar *pickerDateToolbar = [[UIToolbar alloc] initWithFrame:CGRectMake(0, 0, 320, 44)];
+    pickerDateToolbar.barStyle = UIBarStyleBlackOpaque;
+    [pickerDateToolbar sizeToFit];
+    
+    NSMutableArray *barItems = [[NSMutableArray alloc] init];
+    
+    UIBarButtonItem *flexSpace = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:self action:nil];
+    [barItems addObject:flexSpace];
+    
+    UIBarButtonItem *btnCancel = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(DatePickerDoneClick)];
+    [barItems addObject:btnCancel];
+    
+    [pickerDateToolbar setItems:barItems animated:YES];
+    
+    [aac addSubview:pickerDateToolbar];
+    [aac addSubview:pickerDate];
+    [aac showInView:self.view];
+    [aac setBounds:CGRectMake(0,0,320, 464)];
 }
 
 -(void)save
@@ -253,7 +471,7 @@
 
 - (IBAction)textFieldDone:(id)sender
 {
-	[sender resignFirstResponder];
+	[self.curTextField resignFirstResponder];
 }
 
 - (void)didReceiveMemoryWarning

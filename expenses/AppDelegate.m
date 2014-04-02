@@ -27,6 +27,50 @@
     // Override point for customization after application launch.
     return YES;
 }
+
+-(NSString*)convert24HTimeTo12HTime:(NSString *)inputDate
+{
+    NSDateFormatter *inTimeFormatter = [[NSDateFormatter alloc] init];
+    [inTimeFormatter setDateFormat:@"HH:mm:ss"];
+    NSDate *date = [inTimeFormatter dateFromString:inputDate];
+    
+    NSDateFormatter *outTimeFormatter = [[NSDateFormatter alloc] init];
+    [outTimeFormatter setDateFormat:@"hh:mm a"];
+    return [outTimeFormatter stringFromDate:date];
+}
+
+- (BOOL)validateEmailWithString:(NSString*)email
+{
+    NSString *emailRegex = @"[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}";
+    NSPredicate *emailTest = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", emailRegex];
+    return [emailTest evaluateWithObject:email];
+}
+
+-(BOOL)IsNullOrEmpty:(NSString*)strValue
+{
+    NSString *value = [strValue stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+    
+    if (value == nil || [value isEqualToString:@""])
+    {
+        return TRUE;
+    }
+    return FALSE;
+}
+
+-(BOOL)IsNumber:(NSString*)strValue
+{
+    NSString *value = [strValue stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+    
+    NSError *error1 = NULL;
+    NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"^([0-9]+)?(\\.([0-9]{1,2})?)?$" options:NSRegularExpressionCaseInsensitive error:&error1];
+    NSUInteger matches = [regex numberOfMatchesInString:value options:0 range:NSMakeRange(0, [value length])];
+    
+    if (matches == 0)
+    {
+        return FALSE;
+    }
+    return TRUE;
+}
 							
 - (void)applicationWillResignActive:(UIApplication *)application
 {

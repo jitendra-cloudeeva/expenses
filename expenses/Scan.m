@@ -40,7 +40,7 @@
     
     hasImage = FALSE;
     
-    self.view.backgroundColor = [UIColor clearColor];
+    self.view.backgroundColor = [UIColor colorWithRed:165/255.0f green:217/255.0f blue:235/255.0f alpha:1.0f];
     
     UIBarButtonItem *itemright = [[UIBarButtonItem alloc] initWithTitle:@"Upload" style:UIBarButtonItemStylePlain target:self action:@selector(uploadImage)];
     self.navigationItem.rightBarButtonItem = itemright;
@@ -49,19 +49,35 @@
     imageView.image = [UIImage imageNamed:@"NoImage.png"];
     [self.view addSubview:imageView];
     
-    UIButton *choosePhotoBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    [choosePhotoBtn setFrame:CGRectMake(10, 433, 135, 37)];
-    choosePhotoBtn.tag = 1;
-    [choosePhotoBtn setImage:[UIImage imageNamed:@"ChoosePhoto.png"] forState:UIControlStateNormal];
-    [choosePhotoBtn addTarget:self action:@selector(getPhoto:) forControlEvents:UIControlEventTouchUpInside];
-    [self.view addSubview:choosePhotoBtn];
+    /*UIButton *btnChoosePhoto = [UIButton buttonWithType:UIButtonTypeCustom];
+    [btnChoosePhoto setFrame:CGRectMake(10, 433, 135, 37)];
+    btnChoosePhoto.tag = 1;
+    [btnChoosePhoto setImage:[UIImage imageNamed:@"ChoosePhoto.png"] forState:UIControlStateNormal];
+    [btnChoosePhoto addTarget:self action:@selector(getPhoto:) forControlEvents:UIControlEventTouchUpInside];
+    [self.view addSubview:btnChoosePhoto];
     
-    UIButton *takePhotoBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    takePhotoBtn.tag = 2;
-    [takePhotoBtn setFrame:CGRectMake(115, 433, 240, 37)];
-    [takePhotoBtn setImage:[UIImage imageNamed:@"takephoto.png"] forState:UIControlStateNormal];
-    [takePhotoBtn addTarget:self action:@selector(getPhoto:) forControlEvents:UIControlEventTouchUpInside];
-    [self.view addSubview:takePhotoBtn];
+    UIButton *btnTakePhoto = [UIButton buttonWithType:UIButtonTypeCustom];
+    btnTakePhoto.tag = 2;
+    [btnTakePhoto setFrame:CGRectMake(115, 433, 240, 37)];
+    [btnTakePhoto setImage:[UIImage imageNamed:@"takephoto.png"] forState:UIControlStateNormal];
+    [btnTakePhoto addTarget:self action:@selector(getPhoto:) forControlEvents:UIControlEventTouchUpInside];
+    [self.view addSubview:btnTakePhoto];*/
+    
+    CGRect frame, remain;
+    CGRectDivide(self.view.bounds, &frame, &remain, 44, CGRectMaxYEdge);
+    UIToolbar *toolbar = [[UIToolbar alloc] initWithFrame:frame];
+    [toolbar setAutoresizingMask:UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleTopMargin];
+    
+    toolbar.items = [NSArray arrayWithObjects:
+                     [[UIBarButtonItem alloc]initWithTitle:@"Choose Photo" style:UIBarButtonItemStyleDone target:self action:@selector(getPhotoFromAlbum)],
+                     [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil],
+                     [[UIBarButtonItem alloc]initWithTitle:@"Take Photo" style:UIBarButtonItemStyleDone target:self action:@selector(getPhotoFromCamera)],
+                     nil];
+    [toolbar sizeToFit];
+    toolbar.tintColor = [UIColor whiteColor];
+    toolbar.barTintColor = [UIColor colorWithRed:50/255.0f green:134/255.0f blue:221/255.0f alpha:1.0f];//[UIColor colorWithRed:47/255.0f green:177/255.0f blue:241/255.0f alpha:1.0f];
+    
+    [self.view addSubview:toolbar];
     
     if(image)
     {
@@ -82,33 +98,32 @@
     [self.navigationController popViewControllerAnimated:YES];
 }
 
--(void) getPhoto:(id) sender
+-(void) getPhotoFromAlbum
 {
-    UIButton *btn = (UIButton *) sender;
-    
     imagePickerController = [[UIImagePickerController alloc] init];
     imagePickerController.delegate = self;
     
-    if(btn.tag == 1)
+    imagePickerController.sourceType = UIImagePickerControllerSourceTypeSavedPhotosAlbum;
+    [self presentViewController:imagePickerController animated:YES completion:nil];
+}
+
+-(void) getPhotoFromCamera
+{
+    imagePickerController = [[UIImagePickerController alloc] init];
+    imagePickerController.delegate = self;
+    
+    UIDevice *device = [UIDevice currentDevice];
+    if ([[device model] isEqualToString:@"iPhone"] || [[device model] isEqualToString:@"iPad"])
     {
-        imagePickerController.sourceType = UIImagePickerControllerSourceTypeSavedPhotosAlbum;
+        imagePickerController.sourceType = UIImagePickerControllerSourceTypeCamera;
         [self presentViewController:imagePickerController animated:YES completion:nil];
     }
     else
     {
-        UIDevice *device = [UIDevice currentDevice];
-        if ([[device model] isEqualToString:@"iPhone"] || [[device model] isEqualToString:@"iPad"])
-        {
-            imagePickerController.sourceType = UIImagePickerControllerSourceTypeCamera;
-            [self presentViewController:imagePickerController animated:YES completion:nil];
-        }
-        else
-        {
-            UIAlertView *alert =[[UIAlertView alloc] initWithTitle:@"Alert" message:@"Your device doesn't support this feature." delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
-            alert.tag = 1;
-            [alert show];
-        }
-    }	
+        UIAlertView *alert =[[UIAlertView alloc] initWithTitle:@"Alert" message:@"Your device doesn't support this feature." delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+        alert.tag = 1;
+        [alert show];
+    }
 }
 
 - (void) viewWillAppear:(BOOL)animated; 

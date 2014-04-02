@@ -23,4 +23,10 @@
 @property (strong, nonatomic) UINavigationController *navController;
 @property (strong, nonatomic) NSMutableArray *arrayReceiptImages;
 
+-(NSString*)convert24HTimeTo12HTime:(NSString *)inputDate;
+-(BOOL)validateEmailWithString:(NSString*)email;
+-(BOOL)IsNullOrEmpty:(NSString*)strValue;
+-(BOOL)IsNumber:(NSString*)strValue;
+
+
 @end

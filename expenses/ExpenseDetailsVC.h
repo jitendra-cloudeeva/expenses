@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
-@interface ExpenseDetailsVC : UIViewController<UITextFieldDelegate>
+@interface ExpenseDetailsVC : UIViewController<UITextFieldDelegate, UIPickerViewDelegate, UIPickerViewDataSource, UIActionSheetDelegate>
 {
     UILabel *lblName;
     UILabel *lblEmail;
@@ -16,7 +16,22 @@
     UITextField *txtClientName;
     UITextField *txtAmount;
     BOOL isSubmitted;
+    UITextField *txtDOB;
+
+    UIKeyboardType currentKBType;
+    UITextField *curTextField;
+    UIButton *doneButton;
+
+    UIDatePicker *pickerDate;
+    UIActionSheet *aac;
+    NSMutableArray *travelTypes;
+    UIButton *btnTravelType;
+    UIPickerView *travelTypePickerView;
 }
+
+@property (nonatomic) UIKeyboardType currentKBType;
+@property(nonatomic,strong) UITextField *curTextField;
+@property(nonatomic,strong) UIButton *doneButton;
 
 @property(nonatomic, assign) BOOL isSubmitted;
 

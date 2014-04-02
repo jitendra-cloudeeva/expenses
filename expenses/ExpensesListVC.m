@@ -18,6 +18,8 @@
 {
     [APP_DELEGATE.arrayReceiptImages removeAllObjects];
     
+    self.view.backgroundColor = [UIColor colorWithRed:165/255.0f green:217/255.0f blue:235/255.0f alpha:1.0f];
+    
     arraySavedExpenses = [[NSMutableArray alloc] init];
     [arraySavedExpenses addObject:@"Trip to Gurgaon"];
     [arraySavedExpenses addObject:@"Hyderabad Visit"];
@@ -32,10 +34,10 @@
     [arraySubmittedExpenses addObject:@"Hyderabad Visit"];
     [arraySubmittedExpenses addObject:@"Pune Expenses"];
     
-    tView = [[UITableView alloc] initWithFrame:CGRectMake(0, 0, 300, 460)];
+    tView = [[UITableView alloc] initWithFrame:CGRectMake(0, 0, 320, 480)];
 	tView.delegate = self;
 	tView.dataSource = self;
-    tView.backgroundColor = [UIColor clearColor];
+    tView.backgroundColor = [UIColor colorWithRed:165/255.0f green:217/255.0f blue:235/255.0f alpha:1.0f];
     //[tView setSeparatorColor:[UIColor whiteColor]];
     [self.view addSubview:tView];
 }
@@ -91,6 +93,8 @@
     }
     
     [[cell contentView] addSubview:label];
+    
+    //cell.backgroundColor = [UIColor colorWithRed:165/255.0f green:217/255.0f blue:235/255.0f alpha:1.0f];
     
     return cell;
 }

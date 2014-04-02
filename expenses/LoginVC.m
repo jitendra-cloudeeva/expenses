@@ -21,7 +21,7 @@
     [super viewDidLoad];
 	// Do any additional setup after loading the view, typically from a nib.
     
-    self.view.backgroundColor = [UIColor clearColor];
+    self.view.backgroundColor = [UIColor colorWithRed:165/255.0f green:217/255.0f blue:235/255.0f alpha:1.0f];
     
     txtUsername = [[UITextField alloc] initWithFrame:CGRectMake(30, 130, 260, 30)];
 	txtUsername.font = [UIFont systemFontOfSize:17];
@@ -63,7 +63,8 @@
     [btnLogin addTarget:self action:@selector(Login) forControlEvents:UIControlEventTouchUpInside];
     [self.view addSubview:btnLogin];
     
-    self.navigationController.navigationBar.barTintColor = [UIColor colorWithRed:47/255.0f green:177/255.0f blue:241/255.0f alpha:1.0f];
+    self.navigationController.navigationBar.tintColor = [UIColor whiteColor];
+    self.navigationController.navigationBar.barTintColor = [UIColor colorWithRed:50/255.0f green:134/255.0f blue:221/255.0f alpha:1.0f];//[UIColor colorWithRed:47/255.0f green:177/255.0f blue:241/255.0f alpha:1.0f];
 }
 
 -(void)Login
