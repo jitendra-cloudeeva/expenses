@@ -16,16 +16,15 @@
     UITextField *txtClientName;
     UITextField *txtAmount;
     BOOL isSubmitted;
-    UITextField *txtDOB;
-
+    
     UIKeyboardType currentKBType;
     UITextField *curTextField;
-    UIButton *doneButton;
-
+    
     UIDatePicker *pickerDate;
     UIActionSheet *aac;
     NSMutableArray *travelTypes;
     UIButton *btnTravelType;
+    UIButton *btnDOB;
     UIPickerView *travelTypePickerView;
 }
 

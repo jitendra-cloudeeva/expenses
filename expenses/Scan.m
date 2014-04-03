@@ -49,29 +49,15 @@
     imageView.image = [UIImage imageNamed:@"NoImage.png"];
     [self.view addSubview:imageView];
     
-    /*UIButton *btnChoosePhoto = [UIButton buttonWithType:UIButtonTypeCustom];
-    [btnChoosePhoto setFrame:CGRectMake(10, 433, 135, 37)];
-    btnChoosePhoto.tag = 1;
-    [btnChoosePhoto setImage:[UIImage imageNamed:@"ChoosePhoto.png"] forState:UIControlStateNormal];
-    [btnChoosePhoto addTarget:self action:@selector(getPhoto:) forControlEvents:UIControlEventTouchUpInside];
-    [self.view addSubview:btnChoosePhoto];
-    
-    UIButton *btnTakePhoto = [UIButton buttonWithType:UIButtonTypeCustom];
-    btnTakePhoto.tag = 2;
-    [btnTakePhoto setFrame:CGRectMake(115, 433, 240, 37)];
-    [btnTakePhoto setImage:[UIImage imageNamed:@"takephoto.png"] forState:UIControlStateNormal];
-    [btnTakePhoto addTarget:self action:@selector(getPhoto:) forControlEvents:UIControlEventTouchUpInside];
-    [self.view addSubview:btnTakePhoto];*/
-    
     CGRect frame, remain;
     CGRectDivide(self.view.bounds, &frame, &remain, 44, CGRectMaxYEdge);
     UIToolbar *toolbar = [[UIToolbar alloc] initWithFrame:frame];
     [toolbar setAutoresizingMask:UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleTopMargin];
     
     toolbar.items = [NSArray arrayWithObjects:
-                     [[UIBarButtonItem alloc]initWithTitle:@"Choose Photo" style:UIBarButtonItemStyleDone target:self action:@selector(getPhotoFromAlbum)],
+                     [[UIBarButtonItem alloc]initWithTitle:@"Choose Picture" style:UIBarButtonItemStyleDone target:self action:@selector(getPhotoFromAlbum)],
                      [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil],
-                     [[UIBarButtonItem alloc]initWithTitle:@"Take Photo" style:UIBarButtonItemStyleDone target:self action:@selector(getPhotoFromCamera)],
+                     [[UIBarButtonItem alloc]initWithTitle:@"Take Picture" style:UIBarButtonItemStyleDone target:self action:@selector(getPhotoFromCamera)],
                      nil];
     [toolbar sizeToFit];
     toolbar.tintColor = [UIColor whiteColor];

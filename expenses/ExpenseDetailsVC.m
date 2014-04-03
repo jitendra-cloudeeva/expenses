@@ -15,7 +15,7 @@
 
 @implementation ExpenseDetailsVC
 
-@synthesize isSubmitted;
+@synthesize isSubmitted, currentKBType, curTextField;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -53,42 +53,42 @@
     picture.image = [UIImage imageNamed:@"jitu.png"];
     [self.view addSubview:picture];
     
-    UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(120, 80, 70, 30)];
+    UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(115, 80, 70, 30)];
 	label.backgroundColor = [UIColor clearColor];
 	label.font = [UIFont boldSystemFontOfSize:14];
 	label.textColor = [UIColor blackColor];
 	label.text = @"Name: ";
     [self.view addSubview:label];
     
-    lblName = [[UILabel alloc] initWithFrame:CGRectMake(170, 80, 200, 30)];
+    lblName = [[UILabel alloc] initWithFrame:CGRectMake(160, 80, 200, 30)];
     lblName.backgroundColor = [UIColor clearColor];
 	lblName.font = [UIFont systemFontOfSize:14];
 	lblName.textColor = [UIColor blackColor];
 	lblName.text = @"Jitendra Rajoria";
     [self.view addSubview:lblName];
     
-    label = [[UILabel alloc] initWithFrame:CGRectMake(120, 110, 70, 30)];
+    label = [[UILabel alloc] initWithFrame:CGRectMake(115, 110, 70, 30)];
 	label.backgroundColor = [UIColor clearColor];
 	label.font = [UIFont boldSystemFontOfSize:14];
 	label.textColor = [UIColor blackColor];
 	label.text = @"Email: ";
     [self.view addSubview:label];
     
-    lblEmail = [[UILabel alloc] initWithFrame:CGRectMake(170, 110, 200, 30)];
+    lblEmail = [[UILabel alloc] initWithFrame:CGRectMake(160, 110, 200, 30)];
     lblEmail.backgroundColor = [UIColor clearColor];
 	lblEmail.font = [UIFont systemFontOfSize:14];
 	lblEmail.textColor = [UIColor blackColor];
 	lblEmail.text = @"jrajoria@cloudeeva.com";
     [self.view addSubview:lblEmail];
     
-    label = [[UILabel alloc] initWithFrame:CGRectMake(120, 140, 70, 30)];
+    label = [[UILabel alloc] initWithFrame:CGRectMake(115, 140, 70, 30)];
 	label.backgroundColor = [UIColor clearColor];
 	label.font = [UIFont boldSystemFontOfSize:14];
 	label.textColor = [UIColor blackColor];
 	label.text = @"Phone: ";
     [self.view addSubview:label];
     
-    lblPhone = [[UILabel alloc] initWithFrame:CGRectMake(170, 140, 200, 30)];
+    lblPhone = [[UILabel alloc] initWithFrame:CGRectMake(160, 140, 200, 30)];
     lblPhone.backgroundColor = [UIColor clearColor];
 	lblPhone.font = [UIFont systemFontOfSize:14];
 	lblPhone.textColor = [UIColor blackColor];
@@ -102,29 +102,17 @@
 	label.text = @"Expense Submission Date: ";
     [self.view addSubview:label];
     
-    txtDOB = [[UITextField alloc] initWithFrame:CGRectMake(195, 180, 115, 30)];
-	txtDOB.font = [UIFont systemFontOfSize:15];
-    txtDOB.tag = 1;
-    txtDOB.autocorrectionType = UITextAutocorrectionTypeNo;
-    txtDOB.placeholder = @" Date of birth*";
-    txtDOB.delegate = self;
-	txtDOB.textColor = [UIColor blackColor];
-	txtDOB.text = @"";
-    txtDOB.borderStyle = UITextBorderStyleLine;
-    txtDOB.backgroundColor = [UIColor whiteColor];
-    txtDOB.layer.borderColor=[[UIColor lightGrayColor]CGColor];
-    txtDOB.layer.borderWidth= 1.0f;
-    [txtDOB addTarget:self action:@selector(textFieldDone:) forControlEvents:UIControlEventEditingDidEndOnExit];
-    txtDOB.keyboardType = UIKeyboardTypeDefault;
-    txtDOB.returnKeyType = UIReturnKeyDone;
-    [self.view addSubview:txtDOB];
-    
-    /*label = [[UILabel alloc] initWithFrame:CGRectMake(195, 180, 180, 30)];
-	label.backgroundColor = [UIColor clearColor];
-	label.font = [UIFont systemFontOfSize:14];
-	label.textColor = [UIColor blackColor];
-	label.text = @"1st April 2014";
-    [self.view addSubview:label];*/
+    btnDOB = [UIButton buttonWithType:UIButtonTypeCustom];
+    [btnDOB setFrame:CGRectMake(195, 184, 115, 25)];
+    [btnDOB setTitle:@"date of birth" forState:UIControlStateNormal];
+    [btnDOB setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+    btnDOB.titleLabel.font = [UIFont systemFontOfSize:14];
+    [[btnDOB layer] setBorderWidth:1.0f];
+    [[btnDOB layer] setBorderColor:[[UIColor lightGrayColor]CGColor]];
+    btnDOB.contentHorizontalAlignment = UIControlContentHorizontalAlignmentLeft;
+    [btnDOB setBackgroundImage:[UIImage imageNamed:@"dropdown.png"] forState:UIControlStateNormal];
+    [btnDOB addTarget:self action:@selector(ShowDOBPicker) forControlEvents:UIControlEventTouchUpInside];
+    [self.view addSubview:btnDOB];
     
     label = [[UILabel alloc] initWithFrame:CGRectMake(15, 210, 180, 30)];
 	label.backgroundColor = [UIColor clearColor];
@@ -134,7 +122,7 @@
     [self.view addSubview:label];
     
     btnTravelType = [UIButton buttonWithType:UIButtonTypeCustom];
-    [btnTravelType setFrame:CGRectMake(120, 213, 140, 25)];
+    [btnTravelType setFrame:CGRectMake(120, 213, 190, 25)];
     [btnTravelType setTitle:@"select travel type" forState:UIControlStateNormal];
     [btnTravelType setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
     btnTravelType.titleLabel.font = [UIFont systemFontOfSize:14];
@@ -144,13 +132,6 @@
     [btnTravelType setBackgroundImage:[UIImage imageNamed:@"dropdown.png"] forState:UIControlStateNormal];
     [btnTravelType addTarget:self action:@selector(showTravelTypePicker) forControlEvents:UIControlEventTouchUpInside];
     [self.view addSubview:btnTravelType];
-    
-    /*label = [[UILabel alloc] initWithFrame:CGRectMake(115, 210, 180, 30)];
-	label.backgroundColor = [UIColor clearColor];
-	label.font = [UIFont systemFontOfSize:14];
-	label.textColor = [UIColor blackColor];
-	label.text = @"Travel";
-    [self.view addSubview:label];*/
     
     label = [[UILabel alloc] initWithFrame:CGRectMake(15, 240, 140, 30)];
 	label.backgroundColor = [UIColor clearColor];
@@ -218,8 +199,8 @@
     [self.view addSubview:txtAmount];
     
     UIButton *btnUploadInvoice = [UIButton buttonWithType:UIButtonTypeCustom];
-    btnUploadInvoice.frame = CGRectMake(10, 360, 120, 40);
-    [btnUploadInvoice setTitle:@"Upload Invoice" forState:UIControlStateNormal];
+    btnUploadInvoice.frame = CGRectMake(7, 360, 120, 40);
+    [btnUploadInvoice setTitle:@"Invoice Image" forState:UIControlStateNormal];
     [btnUploadInvoice setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
     btnUploadInvoice.titleLabel.font = [UIFont boldSystemFontOfSize:16];
     //[btnUploadInvoice setImage:[UIImage imageNamed:@"invoice.png"] forState:UIControlStateNormal];
@@ -230,10 +211,6 @@
     {
         for (int i = 0; i < [APP_DELEGATE.arrayReceiptImages count]; i++)
         {
-            /*UIImageView *picture = [[UIImageView alloc] initWithFrame:CGRectMake((i * 40)+5, btnUploadInvoice.frame.origin.y + 30, 40, 40)];
-            picture.image = [APP_DELEGATE.arrayReceiptImages objectAtIndex:i];
-            [self.view addSubview:picture];*/
-            
             UIButton *btnPicture = [UIButton buttonWithType:UIButtonTypeCustom];
             btnPicture.tag = i;
             [btnPicture setFrame:CGRectMake((i * 40)+5, btnUploadInvoice.frame.origin.y + 30, 40, 40)];
@@ -245,20 +222,6 @@
     
     if(!isSubmitted)
     {
-        /*UIButton *btnSave = [UIButton buttonWithType:UIButtonTypeCustom];
-        btnSave.tag = 1;
-        [btnSave setFrame:CGRectMake(115, 443, 240, 30)];
-        [btnSave setImage:[UIImage imageNamed:@"save.png"] forState:UIControlStateNormal];
-        [btnSave addTarget:self action:@selector(save) forControlEvents:UIControlEventTouchUpInside];
-        [self.view addSubview:btnSave];
-        
-        UIButton *btnSubmit = [UIButton buttonWithType:UIButtonTypeCustom];
-        [btnSubmit setFrame:CGRectMake(10, 443, 135, 30)];
-        btnSubmit.tag = 2;
-        [btnSubmit setImage:[UIImage imageNamed:@"submit.png"] forState:UIControlStateNormal];
-        [btnSubmit addTarget:self action:@selector(submit) forControlEvents:UIControlEventTouchUpInside];
-        [self.view addSubview:btnSubmit];*/
-        
         CGRect frame, remain;
         CGRectDivide(self.view.bounds, &frame, &remain, 44, CGRectMaxYEdge);
         UIToolbar *toolbar = [[UIToolbar alloc] initWithFrame:frame];
@@ -312,7 +275,8 @@
 {
     NSDateFormatter *outputFormatter = [[NSDateFormatter alloc] init];
     [outputFormatter setDateFormat:@"dd-MM-yyyy"];
-    txtDOB.text = [outputFormatter stringFromDate:pickerDate.date];
+    [btnDOB setTitle:[outputFormatter stringFromDate:pickerDate.date] forState:UIControlStateNormal];
+    //txtDOB.text = [outputFormatter stringFromDate:pickerDate.date];
     [aac dismissWithClickedButtonIndex:0 animated:YES];
 }
 -(BOOL)textFieldShouldBeginEditing:(UITextField *)textField
@@ -326,7 +290,7 @@
         [self ShowDOBPicker];
         return NO;
     }
-    else
+    if(textField.tag == 3)
     {
         UIToolbar* numberToolbar = [[UIToolbar alloc]initWithFrame:CGRectMake(0, 0, 320, 50)];
         numberToolbar.barStyle = UIBarStyleBlackTranslucent;
@@ -410,14 +374,17 @@
     aac = [[UIActionSheet alloc] initWithTitle:@"Date of birth" delegate:self cancelButtonTitle:nil destructiveButtonTitle:nil otherButtonTitles:nil];
     
     pickerDate = [[UIDatePicker alloc] initWithFrame:CGRectMake(0.0, 44.0, 0.0, 0.0)];
-    //pickerDate.maximumDate = [NSDate date];
-    if(![APP_DELEGATE IsNullOrEmpty:txtDOB.text])
+    pickerDate.maximumDate = [NSDate date];
+    if(![APP_DELEGATE IsNullOrEmpty:btnDOB.titleLabel.text])
     {
         NSDateFormatter *inputFormatter = [[NSDateFormatter alloc] init];
         inputFormatter.dateStyle = NSDateFormatterShortStyle;
         [inputFormatter setDateFormat:@"dd-MM-yyyy"];
-        NSDate *date = [inputFormatter dateFromString:txtDOB.text];
-        pickerDate.date = date;
+        NSDate *date = [inputFormatter dateFromString:btnDOB.titleLabel.text];
+        if(date != nil)
+        {
+            pickerDate.date = date;
+        }
     }
     pickerDate.datePickerMode = UIDatePickerModeDate;
     
