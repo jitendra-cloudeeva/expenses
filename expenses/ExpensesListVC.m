@@ -37,6 +37,7 @@
     tView = [[UITableView alloc] initWithFrame:CGRectMake(0, 0, 320, 480)];
 	tView.delegate = self;
 	tView.dataSource = self;
+    tView.separatorInset = UIEdgeInsetsZero;
     tView.backgroundColor = [UIColor colorWithRed:165/255.0f green:217/255.0f blue:235/255.0f alpha:1.0f];
     //[tView setSeparatorColor:[UIColor whiteColor]];
     [self.view addSubview:tView];
@@ -99,10 +100,18 @@
     return cell;
 }
 
-- (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
+- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
+    
+    if(section == 0)
+        return @"   Saved Expenses";
+    else
+        return @"   Submitted Expenses";
+}
+
+/*- (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
 {
     UIView *view = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 320, 30)];
-    view.backgroundColor = [UIColor whiteColor];
+    view.backgroundColor = [UIColor lightGrayColor];
     
     UILabel *label = [[UILabel alloc] init];
     label.frame = CGRectMake(5, 0, 320, 30);
@@ -113,14 +122,14 @@
     
     if(section == 0)
     {
-        label.text = @"Save Expenses";
+        label.text = @"Saved Expenses";
     }
     if(section == 1)
     {
         label.text = @"Submitted Expenses";
     }
     return view;
-}
+}*/
 
 
 #pragma mark -
