@@ -24,6 +24,7 @@
     self.window.backgroundColor = [UIColor whiteColor];
     [self.window addSubview:navController.view];
     [self.window makeKeyAndVisible];
+    NSLog(@"Rahul");
     // Override point for customization after application launch.
     return YES;
 }
