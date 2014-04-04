@@ -15,7 +15,7 @@
 
 @implementation ExpenseDetailsVC
 
-@synthesize isSubmitted, currentKBType, curTextField, imagePickerController;
+@synthesize isSubmitted, currentKBType, curTextField, imagePickerController, isNew;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -30,11 +30,16 @@
 {
     [super viewDidLoad];
 	// Do any additional setup after loading the view.
+    
+    [self CreateControls];
 }
 
 - (void) viewWillAppear:(BOOL)animated;
 {
-    [self CreateControls];
+    
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShowNotification:) name:UIKeyboardWillShowNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillHideNotification:) name:UIKeyboardWillHideNotification object:nil];
 }
 
 
@@ -104,7 +109,7 @@
     
     btnExpenseSubmissionDate = [UIButton buttonWithType:UIButtonTypeCustom];
     [btnExpenseSubmissionDate setFrame:CGRectMake(195, 184, 115, 25)];
-    [btnExpenseSubmissionDate setTitle:@"         select" forState:UIControlStateNormal];
+    
     [btnExpenseSubmissionDate setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
     btnExpenseSubmissionDate.titleLabel.font = [UIFont systemFontOfSize:12];
     [[btnExpenseSubmissionDate layer] setBorderWidth:1.0f];
@@ -201,7 +206,7 @@
     
     btnUploadInvoice = [UIButton buttonWithType:UIButtonTypeRoundedRect];
     btnUploadInvoice.frame = CGRectMake(7, 365, 120, 25);
-    [btnUploadInvoice setTitle:@"Invoice Image" forState:UIControlStateNormal];
+    [btnUploadInvoice setTitle:@"Upload Invoice" forState:UIControlStateNormal];
     [btnUploadInvoice setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
     btnUploadInvoice.titleLabel.font = [UIFont boldSystemFontOfSize:15];
     
@@ -234,8 +239,32 @@
         [self.view addSubview:toolbar];
     }
     
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShowNotification:) name:UIKeyboardWillShowNotification object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillHideNotification:) name:UIKeyboardWillHideNotification object:nil];
+    if(isNew)
+    {
+        [btnExpenseSubmissionDate setTitle:@"     select date" forState:UIControlStateNormal];
+        [btnTravelType setTitle:@"          select travel type" forState:UIControlStateNormal];
+        
+        txtClientName.text = @"";
+        txtClientName.placeholder = @"enter client name";
+        
+        txtAmount.text = @"";
+        txtAmount.placeholder = @"enter amount";
+        
+        description.text = @"";
+    }
+    else
+    {
+        NSDateFormatter *outputFormatter = [[NSDateFormatter alloc] init];
+        [outputFormatter setDateFormat:@"dd-MM-yyyy"];
+        [btnExpenseSubmissionDate setTitle:[outputFormatter stringFromDate:[NSDate date]] forState:UIControlStateNormal];
+        
+        [btnTravelType setTitle:@"Travel" forState:UIControlStateNormal];
+        
+        if(isSubmitted)
+        {
+            btnUploadInvoice.hidden = TRUE;
+        }
+    }
 }
 
 -(void)addReceiptCollectionScrollView
@@ -382,7 +411,7 @@
     else
     {
         UIAlertView *alert =[[UIAlertView alloc] initWithTitle:@"Alert" message:@"Your device doesn't support this feature." delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
-        alert.tag = 1;
+        alert.tag = 2;
         [alert show];
     }
 }
@@ -531,9 +560,18 @@
     [actionSheet setBounds:CGRectMake(0,0,320, 464)];
 }
 
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+    if (alertView.tag == 1)
+    {
+        [self.navigationController popViewControllerAnimated:TRUE];
+    }
+}
+
 -(void)save
 {
-    UIAlertView *alert =[[UIAlertView alloc] initWithTitle:@"Success" message:@"Expense details saved successfully." delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+    UIAlertView *alert =[[UIAlertView alloc] initWithTitle:@"Success" message:@"Expense details saved successfully." delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+    alert.tag = 1;
     [alert show];
 }
 

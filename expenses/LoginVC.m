@@ -23,11 +23,18 @@
     
     self.view.backgroundColor = [UIColor colorWithRed:165/255.0f green:217/255.0f blue:235/255.0f alpha:1.0f];
     
-    txtUsername = [[UITextField alloc] initWithFrame:CGRectMake(30, 130, 260, 30)];
-	txtUsername.font = [UIFont systemFontOfSize:17];
+    UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(20, 130, 100, 30)];
+	label.backgroundColor = [UIColor clearColor];
+	label.font = [UIFont systemFontOfSize:16];
+	label.textColor = [UIColor blackColor];
+	label.text = @"Username: " ;
+	[self.view addSubview:label];
+    
+    txtUsername = [[UITextField alloc] initWithFrame:CGRectMake(110, 130, 190, 30)];
+	txtUsername.font = [UIFont systemFontOfSize:16];
     txtUsername.tag = 1;
     txtUsername.textColor = [UIColor blackColor];
-	txtUsername.placeholder = @"username*";
+	txtUsername.placeholder = @"username";
     txtUsername.borderStyle = UITextBorderStyleLine;
     txtUsername.backgroundColor = [UIColor whiteColor];
     txtUsername.layer.borderColor=[[UIColor lightGrayColor]CGColor];
@@ -38,10 +45,17 @@
     txtUsername.delegate = self;
 	[self.view addSubview:txtUsername];
     
-    txtPassword = [[UITextField alloc] initWithFrame:CGRectMake(30, 190, 260, 30)];
+    label = [[UILabel alloc] initWithFrame:CGRectMake(20, 180, 100, 30)];
+	label.backgroundColor = [UIColor clearColor];
+	label.font = [UIFont systemFontOfSize:16];
+	label.textColor = [UIColor blackColor];
+	label.text = @"Password: " ;
+	[self.view addSubview:label];
+    
+    txtPassword = [[UITextField alloc] initWithFrame:CGRectMake(110, 180, 190, 30)];
 	txtPassword.font = [UIFont systemFontOfSize:17];
     txtPassword.tag = 2;
-    txtPassword.placeholder = @"password*";
+    txtPassword.placeholder = @"password";
 	txtPassword.textColor = [UIColor blackColor];
 	txtPassword.borderStyle = UITextBorderStyleLine;
     txtPassword.backgroundColor = [UIColor whiteColor];
@@ -54,24 +68,62 @@
     txtPassword.delegate = self;
     [self.view addSubview:txtPassword];
     
-    UIButton *btnLogin = [UIButton buttonWithType:UIButtonTypeCustom];
+    btnLogin = [UIButton buttonWithType:UIButtonTypeCustom];
     //[btnLogin setTitle:@"Login" forState:UIControlStateNormal];
     //[btnLogin setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
     //btnLogin.titleLabel.font = [UIFont systemFontOfSize:15];
-    btnLogin.frame = CGRectMake(90, 235, 120, 30);
+    btnLogin.frame = CGRectMake(145, 225, 120, 30);
     [btnLogin setImage:[UIImage imageNamed:@"signin.png"] forState:UIControlStateNormal];
     [btnLogin addTarget:self action:@selector(Login) forControlEvents:UIControlEventTouchUpInside];
+    btnLogin.enabled = FALSE;
     [self.view addSubview:btnLogin];
     
     self.navigationController.navigationBar.tintColor = [UIColor whiteColor];
     self.navigationController.navigationBar.barTintColor = [UIColor colorWithRed:50/255.0f green:134/255.0f blue:221/255.0f alpha:1.0f];//[UIColor colorWithRed:47/255.0f green:177/255.0f blue:241/255.0f alpha:1.0f];
 }
 
+- (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string
+{
+    if(textField == txtUsername)
+    {
+        if ([[textField text] length] + [string length] - range.length > 3)
+        {
+            btnLogin.enabled = YES;
+        }
+        else
+        {
+            btnLogin.enabled = NO;
+        }
+    }
+    
+    if ([[textField text] length] + [string length] - range.length > 10)
+    {
+        return NO;
+    }
+    else
+    {
+        return YES;
+    }
+    
+    return YES;
+}
+
 -(void)Login
 {
-    ExpensesListVC *evc = [[ExpensesListVC alloc] init];
-    evc.title = @"Expenses";
-    [self.navigationController pushViewController:evc animated:YES];
+    [txtPassword resignFirstResponder];
+    if([txtUsername.text isEqualToString:txtPassword.text])
+    {
+        txtUsername.text = @"";
+        txtPassword.text = @"";
+        ExpensesListVC *evc = [[ExpensesListVC alloc] init];
+        evc.title = @"Expenses";
+        [self.navigationController pushViewController:evc animated:YES];
+    }
+    else
+    {
+        UIAlertView *alert =[[UIAlertView alloc] initWithTitle:@"Alert" message:@"Invalid username or password, try again." delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+        [alert show];
+    }
 }
 
 - (IBAction)textFieldDone:(id)sender

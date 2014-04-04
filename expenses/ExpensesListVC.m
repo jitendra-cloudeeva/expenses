@@ -41,6 +41,19 @@
     tView.backgroundColor = [UIColor colorWithRed:165/255.0f green:217/255.0f blue:235/255.0f alpha:1.0f];
     //[tView setSeparatorColor:[UIColor whiteColor]];
     [self.view addSubview:tView];
+    
+    UIBarButtonItem *itemright = [[UIBarButtonItem alloc] initWithTitle:@"Create" style:UIBarButtonItemStylePlain target:self action:@selector(createNewExpense)];
+    self.navigationItem.rightBarButtonItem = itemright;
+}
+
+-(void)createNewExpense
+{
+    ExpenseDetailsVC *edvc = [[ExpenseDetailsVC alloc] init];
+    edvc.title = @"New Expense";
+    edvc.isNew = TRUE;
+    [APP_DELEGATE.arrayReceiptImages removeAllObjects];
+    edvc.isSubmitted = FALSE;
+    [self.navigationController pushViewController:edvc animated:YES];
 }
 
 #pragma mark -
@@ -138,15 +151,17 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     ExpenseDetailsVC *edvc = [[ExpenseDetailsVC alloc] init];
-    edvc.title = @"Expense Details";
+    
     if (indexPath.section == 0)
     {
         [APP_DELEGATE.arrayReceiptImages removeAllObjects];
         edvc.isSubmitted = FALSE;
+        edvc.title = [arraySavedExpenses objectAtIndex:indexPath.row];
     }
     else
     {
         edvc.isSubmitted = TRUE;
+        edvc.title = [arraySubmittedExpenses objectAtIndex:indexPath.row];
     }
     [self.navigationController pushViewController:edvc animated:YES];
 }

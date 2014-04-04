@@ -31,6 +31,8 @@
     UIImagePickerController *imagePickerController;
     
     UIScrollView *receiptCollectionScrollView;
+    
+    BOOL isNew;
 }
 
 @property (nonatomic) UIKeyboardType currentKBType;
@@ -38,6 +40,7 @@
 @property(nonatomic,strong) UIButton *doneButton;
 
 @property(nonatomic, assign) BOOL isSubmitted;
+@property(nonatomic, assign) BOOL isNew;
 
 @property(nonatomic,strong)UIImagePickerController *imagePickerController;
 

@@ -12,6 +12,7 @@
 {
     UITextField *txtUsername;
     UITextField *txtPassword;
+    UIButton *btnLogin;
 }
 
 @end
