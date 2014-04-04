@@ -13,14 +13,15 @@
 {
     UIImagePickerController *imagePickerController;
     UIImageView *imageView;
-    UIActivityIndicatorView *myIndicator;
     BOOL hasImage;
     UIImage *image;
+    int imageButtonIndex;
 }
 
 @property(nonatomic,strong)UIImagePickerController *imagePickerController;
 @property(nonatomic,strong)UIImageView *imageView;
 @property(nonatomic,strong)UIImage *image;
+@property(assign) int imageButtonIndex;
 
 - (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker;
 

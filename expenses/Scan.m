@@ -10,7 +10,7 @@
 #import "AppDelegate.h"
 
 @implementation Scan
-@synthesize imagePickerController, imageView, image;
+@synthesize imagePickerController, imageView, image, imageButtonIndex;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -42,9 +42,6 @@
     
     self.view.backgroundColor = [UIColor colorWithRed:165/255.0f green:217/255.0f blue:235/255.0f alpha:1.0f];
     
-    UIBarButtonItem *itemright = [[UIBarButtonItem alloc] initWithTitle:@"Upload" style:UIBarButtonItemStylePlain target:self action:@selector(uploadImage)];
-    self.navigationItem.rightBarButtonItem = itemright;
-    
     imageView = [[UIImageView alloc] initWithFrame:CGRectMake(10, 100, 300, 290)];
     imageView.image = [UIImage imageNamed:@"NoImage.png"];
     [self.view addSubview:imageView];
@@ -54,11 +51,7 @@
     UIToolbar *toolbar = [[UIToolbar alloc] initWithFrame:frame];
     [toolbar setAutoresizingMask:UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleTopMargin];
     
-    toolbar.items = [NSArray arrayWithObjects:
-                     [[UIBarButtonItem alloc]initWithTitle:@"Choose Picture" style:UIBarButtonItemStyleDone target:self action:@selector(getPhotoFromAlbum)],
-                     [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil],
-                     [[UIBarButtonItem alloc]initWithTitle:@"Take Picture" style:UIBarButtonItemStyleDone target:self action:@selector(getPhotoFromCamera)],
-                     nil];
+    
     [toolbar sizeToFit];
     toolbar.tintColor = [UIColor whiteColor];
     toolbar.barTintColor = [UIColor colorWithRed:50/255.0f green:134/255.0f blue:221/255.0f alpha:1.0f];//[UIColor colorWithRed:47/255.0f green:177/255.0f blue:241/255.0f alpha:1.0f];
@@ -68,6 +61,18 @@
     if(image)
     {
         imageView.image = image;
+        UIBarButtonItem *itemright = [[UIBarButtonItem alloc] initWithTitle:@"Remove" style:UIBarButtonItemStylePlain target:self action:@selector(RemoveImage)];
+        self.navigationItem.rightBarButtonItem = itemright;
+    }
+    else
+    {
+        
+        
+        toolbar.items = [NSArray arrayWithObjects:
+                         [[UIBarButtonItem alloc]initWithTitle:@"Choose Picture" style:UIBarButtonItemStyleDone target:self action:@selector(getPhotoFromAlbum)],
+                         [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil],
+                         [[UIBarButtonItem alloc]initWithTitle:@"Take Picture" style:UIBarButtonItemStyleDone target:self action:@selector(getPhotoFromCamera)],
+                         nil];
     }
 }
 
@@ -76,6 +81,20 @@
     if(!hasImage)
     {
         UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Alert" message:@"Please take photo of receipt." delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+        [alert show];
+        return;
+    }
+    
+    [APP_DELEGATE.arrayReceiptImages addObject:imageView.image];
+    [self.navigationController popViewControllerAnimated:YES];
+}
+
+- (void)RemoveImage
+{
+    if(image)
+    {
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Alert" message:@"Do you really want to delete this image?" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:@"Cancel", nil];
+        alert.tag = 2;
         [alert show];
         return;
     }
@@ -141,6 +160,9 @@
     
     [self.view bringSubviewToFront:imageView];
     hasImage = TRUE;
+    
+    UIBarButtonItem *itemright = [[UIBarButtonItem alloc] initWithTitle:@"Upload" style:UIBarButtonItemStylePlain target:self action:@selector(uploadImage)];
+    self.navigationItem.rightBarButtonItem = itemright;
 }
 
 - (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker
@@ -152,9 +174,13 @@
 
 - (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
 {
-    if (alertView.tag == 1 || alertView.tag == 2)
+    if (alertView.tag == 2)
     {
-        //[self.navigationController popViewControllerAnimated:TRUE];
+        if(buttonIndex == 0)
+        {
+            [APP_DELEGATE.arrayReceiptImages removeObjectAtIndex:imageButtonIndex];
+            [self.navigationController popViewControllerAnimated:TRUE];
+        }
     }
 }
 

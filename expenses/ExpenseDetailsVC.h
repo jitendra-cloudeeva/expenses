@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
-@interface ExpenseDetailsVC : UIViewController<UITextFieldDelegate, UIPickerViewDelegate, UIPickerViewDataSource, UIActionSheetDelegate>
+@interface ExpenseDetailsVC : UIViewController<UITextFieldDelegate, UIPickerViewDelegate, UIPickerViewDataSource,UIActionSheetDelegate, UIAlertViewDelegate,UITextViewDelegate>
 {
     UILabel *lblName;
     UILabel *lblEmail;
@@ -21,11 +21,14 @@
     UITextField *curTextField;
     
     UIDatePicker *pickerDate;
-    UIActionSheet *aac;
+    UIActionSheet *actionSheet;
     NSMutableArray *travelTypes;
     UIButton *btnTravelType;
-    UIButton *btnDOB;
+    UIButton *btnExpenseSubmissionDate;
     UIPickerView *travelTypePickerView;
+    UIButton *btnUploadInvoice;
+    
+    UIScrollView *receiptCollectionScrollView;
 }
 
 @property (nonatomic) UIKeyboardType currentKBType;
