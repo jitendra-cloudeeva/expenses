@@ -42,6 +42,9 @@
     
     self.view.backgroundColor = [UIColor colorWithRed:165/255.0f green:217/255.0f blue:235/255.0f alpha:1.0f];
     
+    UIBarButtonItem *itemright = [[UIBarButtonItem alloc] initWithTitle:@"Upload" style:UIBarButtonItemStylePlain target:self action:@selector(uploadImage)];
+    self.navigationItem.rightBarButtonItem = itemright;
+    
     imageView = [[UIImageView alloc] initWithFrame:CGRectMake(10, 100, 300, 290)];
     imageView.image = [UIImage imageNamed:@"NoImage.png"];
     [self.view addSubview:imageView];
@@ -66,7 +69,8 @@
     }
     else
     {
-        
+        UIBarButtonItem *itemright = [[UIBarButtonItem alloc] initWithTitle:@"Upload" style:UIBarButtonItemStylePlain target:self action:@selector(uploadImage)];
+        self.navigationItem.rightBarButtonItem = itemright;
         
         toolbar.items = [NSArray arrayWithObjects:
                          [[UIBarButtonItem alloc]initWithTitle:@"Choose Picture" style:UIBarButtonItemStyleDone target:self action:@selector(getPhotoFromAlbum)],
@@ -131,7 +135,7 @@
     }
 }
 
-- (void) viewWillAppear:(BOOL)animated; 
+- (void) viewWillAppear:(BOOL)animated;
 {
     [[self navigationController] setNavigationBarHidden:NO animated:NO];
 	self.navigationItem.title = @"Scan Receipt";
@@ -160,9 +164,6 @@
     
     [self.view bringSubviewToFront:imageView];
     hasImage = TRUE;
-    
-    UIBarButtonItem *itemright = [[UIBarButtonItem alloc] initWithTitle:@"Upload" style:UIBarButtonItemStylePlain target:self action:@selector(uploadImage)];
-    self.navigationItem.rightBarButtonItem = itemright;
 }
 
 - (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker

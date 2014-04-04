@@ -15,7 +15,7 @@
 
 @implementation ExpenseDetailsVC
 
-@synthesize isSubmitted, currentKBType, curTextField;
+@synthesize isSubmitted, currentKBType, curTextField, imagePickerController;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -210,7 +210,7 @@
     btnUploadInvoice.layer.borderColor = [UIColor blackColor].CGColor;
     
     //[btnUploadInvoice setImage:[UIImage imageNamed:@"invoice.png"] forState:UIControlStateNormal];
-    [btnUploadInvoice addTarget:self action:@selector(showImage:) forControlEvents:UIControlEventTouchUpInside];
+    [btnUploadInvoice addTarget:self action:@selector(showPictureOptions) forControlEvents:UIControlEventTouchUpInside];
     [self.view addSubview:btnUploadInvoice];
     
     [self addReceiptCollectionScrollView];
@@ -338,8 +338,70 @@
 -(BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text
 {
     [textView resignFirstResponder];
-
+    
     return YES;
+}
+
+-(void)showPictureOptions
+{
+    [self.curTextField resignFirstResponder];
+    
+    actionSheet = [[UIActionSheet alloc]
+                   initWithTitle:nil
+                   delegate:self
+                   cancelButtonTitle:@"Cancel"
+                   destructiveButtonTitle:nil
+                   otherButtonTitles:@"Choose picture from gallery", @"Take picture from camera", nil];
+    
+    actionSheet.actionSheetStyle = UIActionSheetStyleBlackOpaque;
+    
+    [actionSheet showInView:self.view ];
+    //[actionSheet setBounds:CGRectMake(0,0,320, 200)];
+}
+
+-(void) getPhotoFromAlbum
+{
+    imagePickerController = [[UIImagePickerController alloc] init];
+    imagePickerController.delegate = self;
+    
+    imagePickerController.sourceType = UIImagePickerControllerSourceTypeSavedPhotosAlbum;
+    [self presentViewController:imagePickerController animated:YES completion:nil];
+}
+
+-(void) getPhotoFromCamera
+{
+    imagePickerController = [[UIImagePickerController alloc] init];
+    imagePickerController.delegate = self;
+    
+    UIDevice *device = [UIDevice currentDevice];
+    if ([[device model] isEqualToString:@"iPhone"] || [[device model] isEqualToString:@"iPad"])
+    {
+        imagePickerController.sourceType = UIImagePickerControllerSourceTypeCamera;
+        [self presentViewController:imagePickerController animated:YES completion:nil];
+    }
+    else
+    {
+        UIAlertView *alert =[[UIAlertView alloc] initWithTitle:@"Alert" message:@"Your device doesn't support this feature." delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+        alert.tag = 1;
+        [alert show];
+    }
+}
+
+-(void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+    switch (buttonIndex)
+    {
+        case 0:
+        {
+            [self getPhotoFromAlbum];
+            break;
+        }
+        case 1:
+        {
+            [self getPhotoFromCamera];
+            break;
+        }
+    }
 }
 
 -(void)showTravelTypePicker
@@ -375,6 +437,14 @@
     actionSheet.backgroundColor = [UIColor whiteColor];
     [actionSheet showInView:self.view];
     [actionSheet setBounds:CGRectMake(0,0,320, 464)];
+}
+
+- (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info
+{
+	[picker dismissViewControllerAnimated:YES completion:nil];
+    imagePickerController.view.hidden = YES;
+    [APP_DELEGATE.arrayReceiptImages addObject:[info objectForKey:@"UIImagePickerControllerOriginalImage"]];
+    [self addReceiptCollectionScrollView];
 }
 
 - (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker

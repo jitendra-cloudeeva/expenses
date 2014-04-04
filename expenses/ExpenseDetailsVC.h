@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
-@interface ExpenseDetailsVC : UIViewController<UITextFieldDelegate, UIPickerViewDelegate, UIPickerViewDataSource,UIActionSheetDelegate, UIAlertViewDelegate,UITextViewDelegate>
+@interface ExpenseDetailsVC : UIViewController<UITextFieldDelegate, UIPickerViewDelegate, UIPickerViewDataSource, UIActionSheetDelegate,UIImagePickerControllerDelegate, UIAlertViewDelegate,UINavigationControllerDelegate,UITextViewDelegate>
 {
     UILabel *lblName;
     UILabel *lblEmail;
@@ -28,6 +28,8 @@
     UIPickerView *travelTypePickerView;
     UIButton *btnUploadInvoice;
     
+    UIImagePickerController *imagePickerController;
+    
     UIScrollView *receiptCollectionScrollView;
 }
 
@@ -36,5 +38,7 @@
 @property(nonatomic,strong) UIButton *doneButton;
 
 @property(nonatomic, assign) BOOL isSubmitted;
+
+@property(nonatomic,strong)UIImagePickerController *imagePickerController;
 
 @end
