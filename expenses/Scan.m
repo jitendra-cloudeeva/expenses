@@ -102,9 +102,6 @@
         [alert show];
         return;
     }
-    
-    [APP_DELEGATE.arrayReceiptImages addObject:imageView.image];
-    [self.navigationController popViewControllerAnimated:YES];
 }
 
 -(void) getPhotoFromAlbum

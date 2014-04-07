@@ -42,8 +42,16 @@
     //[tView setSeparatorColor:[UIColor whiteColor]];
     [self.view addSubview:tView];
     
+    UIBarButtonItem *itemleft = [[UIBarButtonItem alloc] initWithTitle:@"Logout" style:UIBarButtonItemStylePlain target:self action:@selector(Logout)];
+    self.navigationItem.leftBarButtonItem = itemleft;
+    
     UIBarButtonItem *itemright = [[UIBarButtonItem alloc] initWithTitle:@"Create" style:UIBarButtonItemStylePlain target:self action:@selector(createNewExpense)];
     self.navigationItem.rightBarButtonItem = itemright;
+}
+
+-(void)Logout
+{
+    [self.navigationController popToRootViewControllerAnimated:YES];
 }
 
 -(void)createNewExpense

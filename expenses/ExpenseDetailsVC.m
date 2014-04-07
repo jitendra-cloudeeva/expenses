@@ -36,7 +36,7 @@
 
 - (void) viewWillAppear:(BOOL)animated;
 {
-    
+    [self addReceiptCollectionScrollView];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShowNotification:) name:UIKeyboardWillShowNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillHideNotification:) name:UIKeyboardWillHideNotification object:nil];
@@ -218,7 +218,7 @@
     [btnUploadInvoice addTarget:self action:@selector(showPictureOptions) forControlEvents:UIControlEventTouchUpInside];
     [self.view addSubview:btnUploadInvoice];
     
-    [self addReceiptCollectionScrollView];
+    
     
     if(!isSubmitted)
     {

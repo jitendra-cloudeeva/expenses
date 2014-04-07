@@ -84,7 +84,7 @@
 
 - (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string
 {
-    if(textField == txtUsername)
+    if(textField == txtPassword)
     {
         if ([[textField text] length] + [string length] - range.length > 3)
         {
