@@ -463,7 +463,7 @@
     
     [actionSheet addSubview:travelTypePickerToolbar];
     [actionSheet addSubview:travelTypePickerView];
-    actionSheet.backgroundColor = [UIColor whiteColor];
+    actionSheet.backgroundColor = [UIColor colorWithRed:248/255.0f green:248/255.0f blue:248/255.0f alpha:1.0f];//[UIColor whiteColor];
     [actionSheet showInView:self.view];
     [actionSheet setBounds:CGRectMake(0,0,320, 464)];
 }
@@ -554,7 +554,7 @@
     [pickerDateToolbar setItems:barItems animated:YES];
     
     [actionSheet addSubview:pickerDateToolbar];
-    actionSheet.backgroundColor = [UIColor whiteColor];
+    actionSheet.backgroundColor = [UIColor colorWithRed:248/255.0f green:248/255.0f blue:248/255.0f alpha:1.0f];//[UIColor whiteColor];
     [actionSheet addSubview:pickerDate];
     [actionSheet showInView:self.view];
     [actionSheet setBounds:CGRectMake(0,0,320, 464)];
