@@ -52,6 +52,7 @@
     self.navigationItem.rightBarButtonItem = itemright;
 }
 
+
 - (void) viewWillAppear:(BOOL)animated;
 {
     [arraySubmittedExpenses removeAllObjects];
@@ -100,7 +101,6 @@
          [alert show];
      }];
 }
-
 
 
 -(void)Logout
