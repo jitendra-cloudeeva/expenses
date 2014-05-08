@@ -16,7 +16,7 @@
 @synthesize ExpenseSubmissionDate;
 @synthesize ClientName;
 @synthesize Notes;
-@synthesize Address;
+@synthesize ClientAddress;
 @synthesize ExpensetypeID;
 @synthesize ExpenseNumber;
 @synthesize Amount;
@@ -24,6 +24,8 @@
 @synthesize CategoryName;
 @synthesize EmpName;
 @synthesize ID;
+@synthesize Status;
+@synthesize Phone;
 
 
 -(id)initWithCode:(NSNumber*)EmpID_
@@ -34,12 +36,14 @@ ExpenseSubmissionDate:(NSString*)ExpenseSubmissionDate_
           EmailID:(NSString*)EmailID_
        ClientName:(NSString*)ClientName_
             Notes:(NSString*)Notes_
-          Address:(NSString*)Address_
+          ClientAddress:(NSString*)ClientAddress_
     ExpenseNumber:(NSString*)ExpenseNumber_
              Name:(NSString*)Name_
      CategoryName:(NSString*)CategoryName_
           EmpName:(NSString*)EmpName_
                ID:(NSNumber*)ID_
+           Status:(NSNumber*)Status_
+            Phone:(NSString*)Phone_
 {
     self = [super init];
     if (self) {
@@ -51,12 +55,14 @@ ExpenseSubmissionDate:(NSString*)ExpenseSubmissionDate_
         self.EmailID = EmailID_;
         self.ClientName = ClientName_;
         self.Notes = Notes_;
-        self.Address = Address_;
+        self.ClientAddress = ClientAddress_;
         self.ExpenseNumber = ExpenseNumber_;
         self.Name = Name_;
         self.CategoryName = CategoryName_;
         self.EmpName = EmpName_;
         self.ID = ID_;
+        self.Status = Status_;
+        self.Phone = Phone_;
     }
     return self;
 }
@@ -73,12 +79,14 @@ ExpenseSubmissionDate:(NSString*)ExpenseSubmissionDate_
     [dictionary setValue:self.EmailID forKey:@"EmailID"];
     [dictionary setValue:self.ClientName forKey:@"ClientName"];
     [dictionary setValue:self.Notes forKey:@"Notes"];
-    [dictionary setValue:self.Address forKey:@"Address"];
+    [dictionary setValue:self.ClientAddress forKey:@"ClientAddress"];
     [dictionary setValue:self.ExpenseNumber forKey:@"ExpenseNumber"];
     [dictionary setValue:self.Name forKey:@"Name"];
     [dictionary setValue:self.CategoryName forKey:@"CategoryName"];
     [dictionary setValue:self.EmpName forKey:@"EmpName"];
     [dictionary setValue:self.ID forKey:@"ID"];
+    [dictionary setValue:self.Status forKey:@"Status"];
+    [dictionary setValue:self.Phone forKey:@"Phone"];
     
     return dictionary;
 }

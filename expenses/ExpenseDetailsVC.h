@@ -38,6 +38,8 @@
     BOOL isNew;
     
     ExpenseObject *expenseObj;
+    UIImageView *picture;
+    UITextField *txtClientAddress;
 }
 @property (nonatomic, strong) NSURLSessionUploadTask *uploadTask;
 @property (nonatomic) UIKeyboardType currentKBType;
@@ -50,5 +52,6 @@
 @property(nonatomic,strong)UIImagePickerController *imagePickerController;
 
 @property (nonatomic, strong) ExpenseObject *expenseObj;
+@property (nonatomic, strong) UIImageView *picture;;
 
 @end

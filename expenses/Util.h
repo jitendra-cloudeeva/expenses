@@ -35,6 +35,13 @@
 + (BOOL)IsNullOrEmpty:(NSString*)strValue;
 + (BOOL)IsNumber:(NSString*)strValue;
 + (NSDate*)convertStringToDate:(NSString*)strDate;
++ (NSString*)convertDateToString:(NSDate*)date;
 + (NSString*)convertDateToJsonDate:(NSDate*)date;
++ (void)setUserPhone:(NSString *)userPhone;
++ (NSString *)getUserPhone;
++ (void)setUserPhotoId:(NSString *)userPhotoId;
++ (NSNumber *)getUserPhotoId;
++ (void)setExpenseId:(NSString *)expenseId;
++ (NSNumber *)getExpenseId;
 
 @end

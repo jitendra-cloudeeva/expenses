@@ -78,7 +78,7 @@
          {
              ExpenseObject *expense =[[ExpenseObject alloc] init];
              
-             expense.Address = [obj objectForKey:@"Address"];
+             expense.ClientAddress = [obj objectForKey:@"Address"];
              expense.Amount= [obj objectForKey:@"Amount"];
              expense.ClientName = [obj objectForKey:@"ClientName"];
              expense.EmailID = [obj objectForKey:@"EmailID"];
@@ -87,7 +87,7 @@
              expense.ExpenseNumber = [obj objectForKey:@"ExpenseNumber"];
              expense.ExpenseSubmissionDate = [Util  deserializeJsonDateString:[obj objectForKey:@"ExpenseSubmissionDate"]];
              expense.ExpensetypeID = [obj objectForKey:@"ExpensetypeID"];
-             expense.Name = @"Test test";//[obj objectForKey:@"Name"];
+             expense.Name = [obj objectForKey:@"Name"];
              expense.Notes = [obj objectForKey:@"Notes"];
              
              [arraySubmittedExpenses addObject:expense];
@@ -166,7 +166,7 @@
     else
     {
         ExpenseObject *ee = [arraySubmittedExpenses objectAtIndex:indexPath.row];
-        label.text = ee.Name;
+        label.text = ee.ExpenseNumber;
     }
     
     [[cell contentView] addSubview:label];
@@ -225,7 +225,7 @@
     {
         edvc.isSubmitted = TRUE;
         ExpenseObject *expense = [arraySubmittedExpenses objectAtIndex:indexPath.row];
-        edvc.title = expense.Name;
+        edvc.title = expense.ExpenseNumber;
         edvc.expenseObj = expense;
     }
     [self.navigationController pushViewController:edvc animated:YES];

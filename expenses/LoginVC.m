@@ -141,6 +141,8 @@
         [Util setUserEmailID:[dicJSON objectForKey:@"EmailID"]];
         [Util setUserStatus:[dicJSON objectForKey:@"Ustatus"]];
         [Util setUserActive:[dicJSON objectForKey:@"Active"]];
+        [Util setUserPhotoId:[dicJSON objectForKey:@"PhotoID"]];
+        [Util setUserPhone:[dicJSON objectForKey:@"cell"]];
         
         txtUsername.text = @"";
         txtPassword.text = @"";

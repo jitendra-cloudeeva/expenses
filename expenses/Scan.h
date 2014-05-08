@@ -9,13 +9,17 @@
 #import <UIKit/UIKit.h>
 #import "AppDelegate.h"
 
-@interface Scan : UIViewController<UINavigationControllerDelegate, UIImagePickerControllerDelegate, UIAlertViewDelegate>
+@interface Scan : UIViewController<UINavigationControllerDelegate, UIImagePickerControllerDelegate, UIAlertViewDelegate, UITextFieldDelegate>
 {
     UIImagePickerController *imagePickerController;
     UIImageView *imageView;
     BOOL hasImage;
     UIImage *image;
     int imageButtonIndex;
+    UITextField *txtExpenseItemName;
+    UIButton *btnExpenseSubmissionDate;
+    UITextField *txtAmount;
+    UITextView *txtDescription;
 }
 
 @property(nonatomic,strong)UIImagePickerController *imagePickerController;

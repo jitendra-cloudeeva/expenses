@@ -14,7 +14,7 @@
 + (void)setUserId:(NSString *)userId
 {
     if (userId == nil || [userId isEqual:[NSNull null]]) {
-        userId = @"";
+        userId = @"0";
     }
     NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
     [prefs setObject:userId forKey:@"userId"];
@@ -26,6 +26,40 @@
     NSNumber *userId = [prefs objectForKey:@"userId"];
     
     return userId;
+}
+
++ (void)setUserPhotoId:(NSString *)userPhotoId
+{
+    if (userPhotoId == nil || [userPhotoId isEqual:[NSNull null]]) {
+        userPhotoId = @"0";
+    }
+    NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
+    [prefs setObject:userPhotoId forKey:@"userPhotoId"];
+}
+
++ (NSNumber *)getUserPhotoId
+{
+    NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
+    NSNumber *userPhotoId = [prefs objectForKey:@"userPhotoId"];
+    
+    return userPhotoId;
+}
+
++ (void)setExpenseId:(NSString *)expenseId
+{
+    if (expenseId == nil || [expenseId isEqual:[NSNull null]]) {
+        expenseId = @"0";
+    }
+    NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
+    [prefs setObject:expenseId forKey:@"expenseId"];
+}
+
++ (NSNumber *)getExpenseId
+{
+    NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
+    NSNumber *expenseId = [prefs objectForKey:@"expenseId"];
+    
+    return expenseId;
 }
 
 + (void)setUserName:(NSString *)userName
@@ -44,6 +78,26 @@
     
     if (userName != nil && ![userName isEqualToString:@""]) {
         return userName;
+    }
+    return @"";
+}
+
++ (void)setUserPhone:(NSString *)userPhone
+{
+    if (userPhone == nil || [userPhone isEqual:[NSNull null]]) {
+        userPhone = @"";
+    }
+    NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
+    [prefs setObject:userPhone forKey:@"userPhone"];
+}
+
++ (NSString *)getUserPhone
+{
+    NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
+    NSString *userPhone = [prefs objectForKey:@"userPhone"];
+    
+    if (userPhone != nil && ![userPhone isEqualToString:@""]) {
+        return userPhone;
     }
     return @"";
 }
@@ -193,6 +247,14 @@
     NSDate *date = [inputFormatter dateFromString:strDate];
     
     return date;
+}
+
++ (NSString*)convertDateToString:(NSDate*)date
+{
+    NSDateFormatter *outputFormatter = [[NSDateFormatter alloc] init];
+    [outputFormatter setDateFormat:@"dd-MM-yyyy"];
+    NSString *strDate = [outputFormatter stringFromDate:date];
+    return strDate;
 }
 
 + (NSString*)convertDateToJsonDate:(NSDate*)date

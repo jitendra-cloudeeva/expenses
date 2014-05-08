@@ -12,6 +12,7 @@
 #import "AFNetworking.h"
 #import "UIKit+AFNetworking.h"
 #import "Util.h"
+#import "UIKit+AFNetworking/UIImageView+AFNetworking.h"
 
 @interface ExpenseDetailsVC ()
 
@@ -19,7 +20,7 @@
 
 @implementation ExpenseDetailsVC
 
-@synthesize isSubmitted, currentKBType, curTextField, imagePickerController, isNew, expenseObj;
+@synthesize isSubmitted, currentKBType, curTextField, imagePickerController, isNew, expenseObj, picture;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -55,61 +56,53 @@
 {
     self.view.backgroundColor = [UIColor colorWithRed:165/255.0f green:217/255.0f blue:235/255.0f alpha:1.0f];
     
-    
-    
-    /*[travelTypes addObject:@"Travel"];
-    [travelTypes addObject:@"Food"];
-    [travelTypes addObject:@"Ticket"];
-    [travelTypes addObject:@"Stationary"];
-    [travelTypes addObject:@"Hotel"];*/
-    
-    UIImageView *picture = [[UIImageView alloc] initWithFrame:CGRectMake(15, 80, 90, 90)];
+    picture = [[UIImageView alloc] initWithFrame:CGRectMake(15, 70, 90, 90)];
     picture.image = [UIImage imageNamed:@"jitu.png"];
     [self.view addSubview:picture];
     
-    UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(115, 80, 70, 30)];
+    UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(115, 70, 70, 30)];
 	label.backgroundColor = [UIColor clearColor];
 	label.font = [UIFont boldSystemFontOfSize:13];
 	label.textColor = [UIColor blackColor];
 	label.text = @"Name: ";
     [self.view addSubview:label];
     
-    lblName = [[UILabel alloc] initWithFrame:CGRectMake(160, 80, 200, 30)];
+    lblName = [[UILabel alloc] initWithFrame:CGRectMake(160, 70, 200, 30)];
     lblName.backgroundColor = [UIColor clearColor];
 	lblName.font = [UIFont systemFontOfSize:12];
 	lblName.textColor = [UIColor blackColor];
 	lblName.text = [Util getEmployeeName];
     [self.view addSubview:lblName];
     
-    label = [[UILabel alloc] initWithFrame:CGRectMake(115, 110, 70, 30)];
+    label = [[UILabel alloc] initWithFrame:CGRectMake(115, 100, 70, 30)];
 	label.backgroundColor = [UIColor clearColor];
 	label.font = [UIFont boldSystemFontOfSize:13];
 	label.textColor = [UIColor blackColor];
 	label.text = @"Email: ";
     [self.view addSubview:label];
     
-    lblEmail = [[UILabel alloc] initWithFrame:CGRectMake(160, 110, 200, 30)];
+    lblEmail = [[UILabel alloc] initWithFrame:CGRectMake(160, 100, 200, 30)];
     lblEmail.backgroundColor = [UIColor clearColor];
 	lblEmail.font = [UIFont systemFontOfSize:12];
 	lblEmail.textColor = [UIColor blackColor];
 	lblEmail.text = [Util getUserEmailID];
     [self.view addSubview:lblEmail];
     
-    label = [[UILabel alloc] initWithFrame:CGRectMake(115, 140, 70, 30)];
+    label = [[UILabel alloc] initWithFrame:CGRectMake(115, 130, 70, 30)];
 	label.backgroundColor = [UIColor clearColor];
 	label.font = [UIFont boldSystemFontOfSize:13];
 	label.textColor = [UIColor blackColor];
 	label.text = @"Phone: ";
     [self.view addSubview:label];
     
-    lblPhone = [[UILabel alloc] initWithFrame:CGRectMake(160, 140, 200, 30)];
+    lblPhone = [[UILabel alloc] initWithFrame:CGRectMake(160, 130, 200, 30)];
     lblPhone.backgroundColor = [UIColor clearColor];
 	lblPhone.font = [UIFont systemFontOfSize:12];
 	lblPhone.textColor = [UIColor blackColor];
-	lblPhone.text = @" +91-9560888706";
+	lblPhone.text = [Util getUserPhone];
     [self.view addSubview:lblPhone];
     
-    label = [[UILabel alloc] initWithFrame:CGRectMake(15, 180, 180, 30)];
+    label = [[UILabel alloc] initWithFrame:CGRectMake(15, 159, 170, 30)];
 	label.backgroundColor = [UIColor clearColor];
 	label.font = [UIFont boldSystemFontOfSize:13];
 	label.textColor = [UIColor blackColor];
@@ -117,7 +110,7 @@
     [self.view addSubview:label];
     
     btnExpenseSubmissionDate = [UIButton buttonWithType:UIButtonTypeCustom];
-    [btnExpenseSubmissionDate setFrame:CGRectMake(195, 184, 115, 25)];
+    [btnExpenseSubmissionDate setFrame:CGRectMake(195, 163, 115, 25)];
     
     [btnExpenseSubmissionDate setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
     btnExpenseSubmissionDate.titleLabel.font = [UIFont systemFontOfSize:12];
@@ -128,7 +121,7 @@
     [btnExpenseSubmissionDate addTarget:self action:@selector(ShowExpenseSubmissionDatePicker) forControlEvents:UIControlEventTouchUpInside];
     [self.view addSubview:btnExpenseSubmissionDate];
     
-    label = [[UILabel alloc] initWithFrame:CGRectMake(15, 210, 180, 30)];
+    label = [[UILabel alloc] initWithFrame:CGRectMake(15, 185, 180, 30)];
 	label.backgroundColor = [UIColor clearColor];
 	label.font = [UIFont boldSystemFontOfSize:13];
 	label.textColor = [UIColor blackColor];
@@ -136,7 +129,7 @@
     [self.view addSubview:label];
     
     btnTravelType = [UIButton buttonWithType:UIButtonTypeCustom];
-    [btnTravelType setFrame:CGRectMake(120, 213, 190, 25)];
+    [btnTravelType setFrame:CGRectMake(120, 192, 190, 25)];
     [btnTravelType setTitle:@"          select travel type" forState:UIControlStateNormal];
     [btnTravelType setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
     btnTravelType.titleLabel.font = [UIFont systemFontOfSize:12];
@@ -147,14 +140,14 @@
     [btnTravelType addTarget:self action:@selector(showTravelTypePicker) forControlEvents:UIControlEventTouchUpInside];
     [self.view addSubview:btnTravelType];
     
-    label = [[UILabel alloc] initWithFrame:CGRectMake(15, 240, 140, 30)];
+    label = [[UILabel alloc] initWithFrame:CGRectMake(15, 220, 140, 30)];
 	label.backgroundColor = [UIColor clearColor];
 	label.font = [UIFont boldSystemFontOfSize:13];
 	label.textColor = [UIColor blackColor];
 	label.text = @"Client Name: ";
     [self.view addSubview:label];
     
-    txtClientName = [[UITextField alloc] initWithFrame:CGRectMake(120, 240, 190, 30)];
+    txtClientName = [[UITextField alloc] initWithFrame:CGRectMake(120, 220, 190, 30)];
 	txtClientName.font = [UIFont systemFontOfSize:12];
     txtClientName.tag = 2;
     txtClientName.text = expenseObj.ClientName;
@@ -170,14 +163,37 @@
     txtClientName.delegate = self;
     [self.view addSubview:txtClientName];
     
-    label = [[UILabel alloc] initWithFrame:CGRectMake(15, 270, 140, 30)];
+    label = [[UILabel alloc] initWithFrame:CGRectMake(15, 253, 140, 30)];
+	label.backgroundColor = [UIColor clearColor];
+	label.font = [UIFont boldSystemFontOfSize:13];
+	label.textColor = [UIColor blackColor];
+	label.text = @"Client Address: ";
+    [self.view addSubview:label];
+    
+    txtClientAddress = [[UITextField alloc] initWithFrame:CGRectMake(120, 253, 190, 30)];
+	txtClientAddress.font = [UIFont systemFontOfSize:12];
+    txtClientAddress.tag = 2;
+    txtClientAddress.text = expenseObj.ClientAddress;
+    txtClientAddress.textColor = [UIColor blackColor];
+	txtClientAddress.borderStyle = UITextBorderStyleLine;
+    txtClientAddress.backgroundColor = [UIColor whiteColor];
+    txtClientAddress.layer.borderColor=[[UIColor lightGrayColor]CGColor];
+    txtClientAddress.layer.borderWidth= 1.0f;
+    [txtClientAddress addTarget:self action:@selector(textFieldDone:) forControlEvents:UIControlEventEditingDidEndOnExit];
+    txtClientAddress.keyboardType = UIKeyboardTypeDefault;
+    txtClientAddress.returnKeyType = UIReturnKeyDone;
+    txtClientAddress.AutocorrectionType = UITextAutocorrectionTypeNo;
+    txtClientAddress.delegate = self;
+    [self.view addSubview:txtClientAddress];
+    
+    label = [[UILabel alloc] initWithFrame:CGRectMake(15, 288, 140, 30)];
 	label.backgroundColor = [UIColor clearColor];
 	label.font = [UIFont boldSystemFontOfSize:13];
 	label.textColor = [UIColor blackColor];
 	label.text = @"Details: ";
     [self.view addSubview:label];
     
-    txtDescription = [[UITextView alloc] initWithFrame:CGRectMake(120, 275, 190, 50)];
+    txtDescription = [[UITextView alloc] initWithFrame:CGRectMake(120, 286, 190, 40)];
     txtDescription.backgroundColor = [UIColor whiteColor];
     txtDescription.layer.borderColor=[[UIColor lightGrayColor]CGColor];
     txtDescription.layer.borderWidth= 1.0f;
@@ -202,7 +218,7 @@
     txtAmount = [[UITextField alloc] initWithFrame:CGRectMake(120, 330, 190, 30)];
 	txtAmount.font = [UIFont systemFontOfSize:12];
     txtAmount.tag = 3;
-    txtAmount.text = [NSString stringWithFormat:@"%.2f", expenseObj.Amount];
+    txtAmount.text = [expenseObj.Amount stringValue];
     txtAmount.textColor = [UIColor blackColor];
 	txtAmount.borderStyle = UITextBorderStyleLine;
     txtAmount.backgroundColor = [UIColor whiteColor];
@@ -256,6 +272,7 @@
         
         txtClientName.text = @"";
         txtClientName.placeholder = @"enter client name";
+        txtClientAddress.placeholder = @"enter client address";
         
         txtAmount.text = @"";
         txtAmount.placeholder = @"enter amount";
@@ -268,13 +285,52 @@
         [outputFormatter setDateFormat:@"dd-MM-yyyy"];
         [btnExpenseSubmissionDate setTitle:[outputFormatter stringFromDate:[NSDate date]] forState:UIControlStateNormal];
         
-        [btnTravelType setTitle:@"Travel" forState:UIControlStateNormal];
-        
         if(isSubmitted)
         {
             btnUploadInvoice.hidden = TRUE;
         }
     }
+    
+    [self getUserPhoto];
+}
+
+-(void)getUserPhoto
+{
+    NSString *URL = [NSString stringWithFormat:@"%@GetPhoto?PhotoID=%@",BASE_URL, [[Util getUserPhotoId] stringValue]];
+    
+    AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
+    manager.responseSerializer = [AFJSONResponseSerializer serializer];
+    
+    [manager GET:URL parameters:nil success:^(NSURLSessionDataTask *task, id responseObject)
+     {
+         NSLog(@"responseObject = %@", responseObject);
+         
+         NSArray *arrayJSON = (NSArray*)[responseObject valueForKeyPath:@"GetPhotoResult"];
+         
+         for(NSDictionary *obj in arrayJSON)
+         {
+             NSArray *byteArray = [obj objectForKey:@"AttachmentFile"];
+             unsigned c = [byteArray count];
+             uint8_t *bytes = malloc(sizeof(*bytes) * c);
+             
+             unsigned i;
+             for (i = 0; i < c; i++)
+             {
+                 NSString *str = [byteArray objectAtIndex:i];
+                 int byte = [str intValue];
+                 bytes[i] = (uint8_t)byte;
+             }
+             
+             NSData *data = [[NSData alloc]initWithBytes:bytes length:c];
+             UIImage *image = [UIImage imageWithData:data];
+             picture.image = image;
+         }
+         
+     } failure:^(NSURLSessionDataTask *task, NSError *error) {
+         NSLog(@"error %@",error);
+         UIAlertView *alert =[[UIAlertView alloc] initWithTitle:@"Alert" message:[error description] delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+         [alert show];
+     }];
 }
 
 -(void)addReceiptCollectionScrollView
@@ -345,9 +401,7 @@
 
 - (void)DatePickerDoneClick
 {
-    NSDateFormatter *outputFormatter = [[NSDateFormatter alloc] init];
-    [outputFormatter setDateFormat:@"dd-MM-yyyy"];
-    [btnExpenseSubmissionDate setTitle:[outputFormatter stringFromDate:pickerDate.date] forState:UIControlStateNormal];
+   [btnExpenseSubmissionDate setTitle:[Util convertDateToString:pickerDate.date] forState:UIControlStateNormal];
     //txtDOB.text = [outputFormatter stringFromDate:pickerDate.date];
     [actionSheet dismissWithClickedButtonIndex:0 animated:YES];
 }
@@ -488,6 +542,11 @@
     imagePickerController.view.hidden = YES;
     [APP_DELEGATE.arrayReceiptImages addObject:[info objectForKey:@"UIImagePickerControllerOriginalImage"]];
     [self addReceiptCollectionScrollView];
+    
+    Scan *scan = [[Scan alloc] init];
+    scan.title = @"Receipt";
+    scan.image = [info objectForKey:@"UIImagePickerControllerOriginalImage"];
+    [self.navigationController pushViewController:scan animated:YES];
 }
 
 - (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker
@@ -633,6 +692,14 @@
              [dicExpenseTypes setObject:[obj objectForKey:@"ExpensetypeID"] forKey:[obj objectForKey:@"CategoryName"]];
          }
          
+         if(expenseObj != nil)
+         {
+             NSArray *temp = [dicExpenseTypes allKeysForObject:expenseObj.ExpensetypeID];
+             NSString *key = [temp lastObject];
+             
+             [btnTravelType setTitle:key forState:UIControlStateNormal];
+         }
+         
      } failure:^(NSURLSessionDataTask *task, NSError *error) {
          NSLog(@"error %@",error);
          UIAlertView *alert =[[UIAlertView alloc] initWithTitle:@"Alert" message:[error description] delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
@@ -673,20 +740,21 @@
     
     ExpenseObject *expense =[[ExpenseObject alloc] init];
     
-    expense.Address = @"gurgaon";
+    expense.ClientAddress = @"gurgaon";
     expense.Amount = [NSNumber numberWithFloat:123.00];//[txtAmount.text floatValue];
     expense.CategoryName = @"testcat";
     expense.ClientName = @"dfdfdf";//txtClientName.text;
     expense.EmailID = [Util getUserEmailID];
     expense.EmpID = [Util getUserId];
     expense.EmpName = [Util getUserName];
-    expense.ExpenseID = [NSNumber numberWithInt:0];
+    expense.ExpenseID = [NSNumber numberWithInt:-1];
     expense.ExpenseNumber = @"1234";
     expense.ExpenseSubmissionDate = [Util convertDateToJsonDate:submissionDate];
     expense.ExpensetypeID = expensetypeID;
-    expense.ID = [NSNumber numberWithInt:0];
-    expense.Name = @"jitendra-rec";
+    expense.ID = [NSNumber numberWithInt:-1];
+    expense.Name = @"jitendrarec";
     expense.Notes = @"dsd";//txtDescription.text;
+    expense.Status = [NSNumber numberWithInt:-1];
     
     NSURL *baseURL = [NSURL URLWithString:BASE_URL];
     //NSURL *baseURL = [NSURL URLWithString:@"http://192.168.1.3:8088/HrmsService.svc/web/"];
@@ -698,6 +766,7 @@
     
     [manager POST:@"CreateUpdateExpense" parameters:[expense toNSDictionary] success:^(NSURLSessionDataTask *task, id responseObject) {
             NSLog(@"responseObject = %@", responseObject);
+            [Util setExpenseId:responseObject];
         UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Success"
                                                             message:@"Expense saved successfully"
                                                            delegate:nil

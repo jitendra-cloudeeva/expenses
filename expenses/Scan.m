@@ -45,7 +45,93 @@
     UIBarButtonItem *itemright = [[UIBarButtonItem alloc] initWithTitle:@"Upload" style:UIBarButtonItemStylePlain target:self action:@selector(uploadImage)];
     self.navigationItem.rightBarButtonItem = itemright;
     
-    imageView = [[UIImageView alloc] initWithFrame:CGRectMake(10, 100, 300, 290)];
+    UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(15, 65, 140, 30)];
+	label.backgroundColor = [UIColor clearColor];
+	label.font = [UIFont boldSystemFontOfSize:13];
+	label.textColor = [UIColor blackColor];
+	label.text = @"Expense Item Name: ";
+    [self.view addSubview:label];
+    
+    txtExpenseItemName = [[UITextField alloc] initWithFrame:CGRectMake(147, 70, 160, 25)];
+	txtExpenseItemName.font = [UIFont systemFontOfSize:12];
+    txtExpenseItemName.tag = 2;
+    //txtExpenseItemName.text = expenseObj.ClientName;
+    txtExpenseItemName.textColor = [UIColor blackColor];
+	txtExpenseItemName.borderStyle = UITextBorderStyleLine;
+    txtExpenseItemName.backgroundColor = [UIColor whiteColor];
+    txtExpenseItemName.layer.borderColor=[[UIColor lightGrayColor]CGColor];
+    txtExpenseItemName.layer.borderWidth= 1.0f;
+    [txtExpenseItemName addTarget:self action:@selector(textFieldDone:) forControlEvents:UIControlEventEditingDidEndOnExit];
+    txtExpenseItemName.keyboardType = UIKeyboardTypeDefault;
+    txtExpenseItemName.returnKeyType = UIReturnKeyDone;
+    txtExpenseItemName.AutocorrectionType = UITextAutocorrectionTypeNo;
+    txtExpenseItemName.delegate = self;
+    [self.view addSubview:txtExpenseItemName];
+    
+    label = [[UILabel alloc] initWithFrame:CGRectMake(15, 100, 170, 25)];
+	label.backgroundColor = [UIColor clearColor];
+	label.font = [UIFont boldSystemFontOfSize:13];
+	label.textColor = [UIColor blackColor];
+	label.text = @"Expense Submission Date: ";
+    [self.view addSubview:label];
+    
+    btnExpenseSubmissionDate = [UIButton buttonWithType:UIButtonTypeCustom];
+    [btnExpenseSubmissionDate setFrame:CGRectMake(185, 100, 122, 25)];
+    
+    [btnExpenseSubmissionDate setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+    btnExpenseSubmissionDate.titleLabel.font = [UIFont systemFontOfSize:12];
+    [[btnExpenseSubmissionDate layer] setBorderWidth:1.0f];
+    [[btnExpenseSubmissionDate layer] setBorderColor:[[UIColor lightGrayColor]CGColor]];
+    btnExpenseSubmissionDate.contentHorizontalAlignment = UIControlContentHorizontalAlignmentLeft;
+    [btnExpenseSubmissionDate setBackgroundImage:[UIImage imageNamed:@"dropdown.png"] forState:UIControlStateNormal];
+    [btnExpenseSubmissionDate addTarget:self action:@selector(ShowExpenseSubmissionDatePicker) forControlEvents:UIControlEventTouchUpInside];
+    [self.view addSubview:btnExpenseSubmissionDate];
+    
+    label = [[UILabel alloc] initWithFrame:CGRectMake(15, 130, 140, 25)];
+	label.backgroundColor = [UIColor clearColor];
+	label.font = [UIFont boldSystemFontOfSize:13];
+	label.textColor = [UIColor blackColor];
+	label.text = @"Amount: ";
+    [self.view addSubview:label];
+    
+    txtAmount = [[UITextField alloc] initWithFrame:CGRectMake(72, 130, 235, 25)];
+	txtAmount.font = [UIFont systemFontOfSize:12];
+    txtAmount.tag = 3;
+    //txtAmount.text = [expenseObj.Amount stringValue];
+    txtAmount.textColor = [UIColor blackColor];
+	txtAmount.borderStyle = UITextBorderStyleLine;
+    txtAmount.backgroundColor = [UIColor whiteColor];
+    txtAmount.layer.borderColor=[[UIColor lightGrayColor]CGColor];
+    txtAmount.layer.borderWidth= 1.0f;
+    [txtAmount addTarget:self action:@selector(textFieldDone:) forControlEvents:UIControlEventEditingDidEndOnExit];
+    txtAmount.keyboardType = UIKeyboardTypeDecimalPad;
+    txtAmount.returnKeyType = UIReturnKeyDone;
+    txtAmount.delegate = self;
+    [self.view addSubview:txtAmount];
+    
+    label = [[UILabel alloc] initWithFrame:CGRectMake(15, 160, 140, 30)];
+	label.backgroundColor = [UIColor clearColor];
+	label.font = [UIFont boldSystemFontOfSize:13];
+	label.textColor = [UIColor blackColor];
+	label.text = @"Details: ";
+    [self.view addSubview:label];
+    
+    txtDescription = [[UITextView alloc] initWithFrame:CGRectMake(72, 160, 235, 40)];
+    txtDescription.backgroundColor = [UIColor whiteColor];
+    txtDescription.layer.borderColor=[[UIColor lightGrayColor]CGColor];
+    txtDescription.layer.borderWidth= 1.0f;
+    txtDescription.text = @"Cloudeeva Inc.";
+    txtDescription.scrollEnabled = YES;
+    txtDescription.pagingEnabled = YES;
+    txtDescription.editable = YES;
+    txtDescription.delegate = self;
+    txtDescription.font = [UIFont systemFontOfSize:12];
+    txtDescription.textColor = [UIColor blackColor];
+    txtDescription.keyboardType = UIKeyboardTypeDefault;
+    txtDescription.returnKeyType = UIReturnKeyDone;
+    [self.view addSubview:txtDescription];
+    
+    imageView = [[UIImageView alloc] initWithFrame:CGRectMake(10, 210, 300, 260)];
     imageView.image = [UIImage imageNamed:@"NoImage.png"];
     [self.view addSubview:imageView];
     
@@ -59,7 +145,7 @@
     toolbar.tintColor = [UIColor whiteColor];
     toolbar.barTintColor = [UIColor colorWithRed:50/255.0f green:134/255.0f blue:221/255.0f alpha:1.0f];//[UIColor colorWithRed:47/255.0f green:177/255.0f blue:241/255.0f alpha:1.0f];
     
-    [self.view addSubview:toolbar];
+    //[self.view addSubview:toolbar];
     
     if(image)
     {
@@ -78,6 +164,10 @@
                          [[UIBarButtonItem alloc]initWithTitle:@"Take Picture" style:UIBarButtonItemStyleDone target:self action:@selector(getPhotoFromCamera)],
                          nil];
     }
+}
+
+- (IBAction)textFieldDone:(id)sender
+{
 }
 
 - (IBAction)uploadImage
