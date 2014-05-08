@@ -8,9 +8,15 @@
 
 #import <UIKit/UIKit.h>
 #import "LoginVC.h"
+#import "AFNetworkActivityIndicatorManager.h"
 
 #define APP_DELEGATE \
 ((AppDelegate *)[UIApplication sharedApplication].delegate)
+
+#define BASE_URL @"http://146.145.105.252/ServiceHRMS/HrmsService.svc/web/"
+
+
+@class LoginVC;
 
 @interface AppDelegate : UIResponder <UIApplicationDelegate>
 {
@@ -22,11 +28,6 @@
 @property (strong, nonatomic) UIWindow *window;
 @property (strong, nonatomic) UINavigationController *navController;
 @property (strong, nonatomic) NSMutableArray *arrayReceiptImages;
-
--(NSString*)convert24HTimeTo12HTime:(NSString *)inputDate;
--(BOOL)validateEmailWithString:(NSString*)email;
--(BOOL)IsNullOrEmpty:(NSString*)strValue;
--(BOOL)IsNumber:(NSString*)strValue;
 
 
 @end

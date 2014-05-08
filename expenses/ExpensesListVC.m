@@ -9,6 +9,9 @@
 #import "ExpensesListVC.h"
 #import "ExpenseDetailsVC.h"
 #import "AppDelegate.h"
+#import "AFNetworking.h"
+#import "Util.h"
+#import "ExpenseObject.h"
 
 @implementation ExpensesListVC
 
@@ -28,11 +31,11 @@
     [arraySavedExpenses addObject:@"Bangalore Expenses"];
     
     arraySubmittedExpenses = [[NSMutableArray alloc] init];
-    [arraySubmittedExpenses addObject:@"2013 Delhi Office Visit"];
+    /*[arraySubmittedExpenses addObject:@"2013 Delhi Office Visit"];
     [arraySubmittedExpenses addObject:@"2014 USA Visit"];
     [arraySubmittedExpenses addObject:@"Canada Expenses"];
     [arraySubmittedExpenses addObject:@"Hyderabad Visit"];
-    [arraySubmittedExpenses addObject:@"Pune Expenses"];
+    [arraySubmittedExpenses addObject:@"Pune Expenses"];*/
     
     tView = [[UITableView alloc] initWithFrame:CGRectMake(0, 0, 320, 480)];
 	tView.delegate = self;
@@ -42,8 +45,67 @@
     //[tView setSeparatorColor:[UIColor whiteColor]];
     [self.view addSubview:tView];
     
+    UIBarButtonItem *itemleft = [[UIBarButtonItem alloc] initWithTitle:@"Logout" style:UIBarButtonItemStylePlain target:self action:@selector(Logout)];
+    self.navigationItem.leftBarButtonItem = itemleft;
+    
     UIBarButtonItem *itemright = [[UIBarButtonItem alloc] initWithTitle:@"Create" style:UIBarButtonItemStylePlain target:self action:@selector(createNewExpense)];
     self.navigationItem.rightBarButtonItem = itemright;
+}
+
+- (void) viewWillAppear:(BOOL)animated;
+{
+    [arraySubmittedExpenses removeAllObjects];
+    [self getExpenseList];
+}
+
+-(void)getExpenseList
+{
+    NSDictionary *parameters = [NSDictionary dictionaryWithObjectsAndKeys:[Util getUserId], @"EmpID",[Util getUserStatus], @"Ustatus", nil];
+    
+    NSString *URL = [BASE_URL stringByAppendingString:[NSString stringWithFormat:@"GetExpenses"]];
+    
+    AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
+    manager.responseSerializer = [AFJSONResponseSerializer serializer];
+    
+    [manager GET:URL parameters:parameters success:^(NSURLSessionDataTask *task, id responseObject)
+     {
+         NSLog(@"responseObject = %@", responseObject);
+         NSArray *arrayJSON = (NSArray*)[responseObject valueForKeyPath:@"JGetExpensesResult"];
+         NSLog(@"responseObject = %@", [arrayJSON valueForKey:@"ExpenseID"]);
+         
+         for(NSDictionary *obj in arrayJSON)
+         {
+             ExpenseObject *expense =[[ExpenseObject alloc] init];
+             
+             expense.Address = [obj objectForKey:@"Address"];
+             expense.Amount= [obj objectForKey:@"Amount"];
+             expense.ClientName = [obj objectForKey:@"ClientName"];
+             expense.EmailID = [obj objectForKey:@"EmailID"];
+             expense.EmpID = [obj objectForKey:@"EmpID"];
+             expense.ExpenseID = [obj objectForKey:@"ExpenseID"];
+             expense.ExpenseNumber = [obj objectForKey:@"ExpenseNumber"];
+             expense.ExpenseSubmissionDate = [Util  deserializeJsonDateString:[obj objectForKey:@"ExpenseSubmissionDate"]];
+             expense.ExpensetypeID = [obj objectForKey:@"ExpensetypeID"];
+             expense.Name = @"Test test";//[obj objectForKey:@"Name"];
+             expense.Notes = [obj objectForKey:@"Notes"];
+             
+             [arraySubmittedExpenses addObject:expense];
+             [tView reloadData];
+         }
+         
+         
+     } failure:^(NSURLSessionDataTask *task, NSError *error) {
+         NSLog(@"error %@",error);
+         UIAlertView *alert =[[UIAlertView alloc] initWithTitle:@"Alert" message:@"Invalid username or password, try again." delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+         [alert show];
+     }];
+}
+
+
+
+-(void)Logout
+{
+    [self.navigationController popToRootViewControllerAnimated:YES];
 }
 
 -(void)createNewExpense
@@ -103,7 +165,8 @@
     }
     else
     {
-        label.text = [NSString stringWithFormat:@"%@", [arraySubmittedExpenses objectAtIndex:indexPath.row]];
+        ExpenseObject *ee = [arraySubmittedExpenses objectAtIndex:indexPath.row];
+        label.text = ee.Name;
     }
     
     [[cell contentView] addSubview:label];
@@ -161,7 +224,9 @@
     else
     {
         edvc.isSubmitted = TRUE;
-        edvc.title = [arraySubmittedExpenses objectAtIndex:indexPath.row];
+        ExpenseObject *expense = [arraySubmittedExpenses objectAtIndex:indexPath.row];
+        edvc.title = expense.Name;
+        edvc.expenseObj = expense;
     }
     [self.navigationController pushViewController:edvc animated:YES];
 }

@@ -7,8 +7,9 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "ExpenseObject.h"
 
-@interface ExpenseDetailsVC : UIViewController<UITextFieldDelegate, UIPickerViewDelegate, UIPickerViewDataSource, UIActionSheetDelegate,UIImagePickerControllerDelegate, UIAlertViewDelegate,UINavigationControllerDelegate,UITextViewDelegate>
+@interface ExpenseDetailsVC : UIViewController<UITextFieldDelegate, UIPickerViewDelegate, UIPickerViewDataSource, UIActionSheetDelegate,UIImagePickerControllerDelegate, UIAlertViewDelegate,UINavigationControllerDelegate,UITextViewDelegate,NSURLSessionTaskDelegate>
 {
     UILabel *lblName;
     UILabel *lblEmail;
@@ -22,19 +23,23 @@
     
     UIDatePicker *pickerDate;
     UIActionSheet *actionSheet;
-    NSMutableArray *travelTypes;
+    NSMutableArray *expenseTypes;
+    NSMutableDictionary *dicExpenseTypes;
     UIButton *btnTravelType;
     UIButton *btnExpenseSubmissionDate;
     UIPickerView *travelTypePickerView;
     UIButton *btnUploadInvoice;
+    UITextView *txtDescription;
     
     UIImagePickerController *imagePickerController;
     
     UIScrollView *receiptCollectionScrollView;
     
     BOOL isNew;
+    
+    ExpenseObject *expenseObj;
 }
-
+@property (nonatomic, strong) NSURLSessionUploadTask *uploadTask;
 @property (nonatomic) UIKeyboardType currentKBType;
 @property(nonatomic,strong) UITextField *curTextField;
 @property(nonatomic,strong) UIButton *doneButton;
@@ -43,5 +48,7 @@
 @property(nonatomic, assign) BOOL isNew;
 
 @property(nonatomic,strong)UIImagePickerController *imagePickerController;
+
+@property (nonatomic, strong) ExpenseObject *expenseObj;
 
 @end

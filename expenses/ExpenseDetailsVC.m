@@ -8,6 +8,10 @@
 
 #import "ExpenseDetailsVC.h"
 #import "Scan.h"
+#import "ExpenseObject.h"
+#import "AFNetworking.h"
+#import "UIKit+AFNetworking.h"
+#import "Util.h"
 
 @interface ExpenseDetailsVC ()
 
@@ -15,7 +19,7 @@
 
 @implementation ExpenseDetailsVC
 
-@synthesize isSubmitted, currentKBType, curTextField, imagePickerController, isNew;
+@synthesize isSubmitted, currentKBType, curTextField, imagePickerController, isNew, expenseObj;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -30,13 +34,17 @@
 {
     [super viewDidLoad];
 	// Do any additional setup after loading the view.
-    
+    expenseTypes = [[NSMutableArray alloc] init];
+    dicExpenseTypes = [[NSMutableDictionary alloc]init];
+    [self getExpenseTypeList];
     [self CreateControls];
+    //[self creatNewExpenses];
+    
 }
 
 - (void) viewWillAppear:(BOOL)animated;
 {
-    
+    [self addReceiptCollectionScrollView];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShowNotification:) name:UIKeyboardWillShowNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillHideNotification:) name:UIKeyboardWillHideNotification object:nil];
@@ -47,12 +55,13 @@
 {
     self.view.backgroundColor = [UIColor colorWithRed:165/255.0f green:217/255.0f blue:235/255.0f alpha:1.0f];
     
-    travelTypes = [[NSMutableArray alloc] init];
-    [travelTypes addObject:@"Travel"];
+    
+    
+    /*[travelTypes addObject:@"Travel"];
     [travelTypes addObject:@"Food"];
     [travelTypes addObject:@"Ticket"];
     [travelTypes addObject:@"Stationary"];
-    [travelTypes addObject:@"Hotel"];
+    [travelTypes addObject:@"Hotel"];*/
     
     UIImageView *picture = [[UIImageView alloc] initWithFrame:CGRectMake(15, 80, 90, 90)];
     picture.image = [UIImage imageNamed:@"jitu.png"];
@@ -69,7 +78,7 @@
     lblName.backgroundColor = [UIColor clearColor];
 	lblName.font = [UIFont systemFontOfSize:12];
 	lblName.textColor = [UIColor blackColor];
-	lblName.text = @"Jitendra Rajoria";
+	lblName.text = [Util getEmployeeName];
     [self.view addSubview:lblName];
     
     label = [[UILabel alloc] initWithFrame:CGRectMake(115, 110, 70, 30)];
@@ -83,7 +92,7 @@
     lblEmail.backgroundColor = [UIColor clearColor];
 	lblEmail.font = [UIFont systemFontOfSize:12];
 	lblEmail.textColor = [UIColor blackColor];
-	lblEmail.text = @"jrajoria@cloudeeva.com";
+	lblEmail.text = [Util getUserEmailID];
     [self.view addSubview:lblEmail];
     
     label = [[UILabel alloc] initWithFrame:CGRectMake(115, 140, 70, 30)];
@@ -148,7 +157,7 @@
     txtClientName = [[UITextField alloc] initWithFrame:CGRectMake(120, 240, 190, 30)];
 	txtClientName.font = [UIFont systemFontOfSize:12];
     txtClientName.tag = 2;
-    txtClientName.text = @"Cloudeeva Inc.";
+    txtClientName.text = expenseObj.ClientName;
     txtClientName.textColor = [UIColor blackColor];
 	txtClientName.borderStyle = UITextBorderStyleLine;
     txtClientName.backgroundColor = [UIColor whiteColor];
@@ -157,6 +166,7 @@
     [txtClientName addTarget:self action:@selector(textFieldDone:) forControlEvents:UIControlEventEditingDidEndOnExit];
     txtClientName.keyboardType = UIKeyboardTypeDefault;
     txtClientName.returnKeyType = UIReturnKeyDone;
+    txtClientName.AutocorrectionType = UITextAutocorrectionTypeNo;
     txtClientName.delegate = self;
     [self.view addSubview:txtClientName];
     
@@ -167,20 +177,20 @@
 	label.text = @"Details: ";
     [self.view addSubview:label];
     
-    UITextView *description = [[UITextView alloc] initWithFrame:CGRectMake(120, 275, 190, 50)];
-    description.backgroundColor = [UIColor whiteColor];
-    description.layer.borderColor=[[UIColor lightGrayColor]CGColor];
-    description.layer.borderWidth= 1.0f;
-    description.text = @"Cloudeeva Inc.";
-    description.scrollEnabled = YES;
-    description.pagingEnabled = YES;
-    description.editable = YES;
-    description.delegate = self;
-    description.font = [UIFont systemFontOfSize:12];
-    description.textColor = [UIColor blackColor];
-    description.keyboardType = UIKeyboardTypeDefault;
-    description.returnKeyType = UIReturnKeyDone;
-    [self.view addSubview:description];
+    txtDescription = [[UITextView alloc] initWithFrame:CGRectMake(120, 275, 190, 50)];
+    txtDescription.backgroundColor = [UIColor whiteColor];
+    txtDescription.layer.borderColor=[[UIColor lightGrayColor]CGColor];
+    txtDescription.layer.borderWidth= 1.0f;
+    txtDescription.text = @"Cloudeeva Inc.";
+    txtDescription.scrollEnabled = YES;
+    txtDescription.pagingEnabled = YES;
+    txtDescription.editable = YES;
+    txtDescription.delegate = self;
+    txtDescription.font = [UIFont systemFontOfSize:12];
+    txtDescription.textColor = [UIColor blackColor];
+    txtDescription.keyboardType = UIKeyboardTypeDefault;
+    txtDescription.returnKeyType = UIReturnKeyDone;
+    [self.view addSubview:txtDescription];
     
     label = [[UILabel alloc] initWithFrame:CGRectMake(15, 330, 140, 30)];
 	label.backgroundColor = [UIColor clearColor];
@@ -192,7 +202,7 @@
     txtAmount = [[UITextField alloc] initWithFrame:CGRectMake(120, 330, 190, 30)];
 	txtAmount.font = [UIFont systemFontOfSize:12];
     txtAmount.tag = 3;
-    txtAmount.text = @"10,000";
+    txtAmount.text = [NSString stringWithFormat:@"%.2f", expenseObj.Amount];
     txtAmount.textColor = [UIColor blackColor];
 	txtAmount.borderStyle = UITextBorderStyleLine;
     txtAmount.backgroundColor = [UIColor whiteColor];
@@ -218,7 +228,7 @@
     [btnUploadInvoice addTarget:self action:@selector(showPictureOptions) forControlEvents:UIControlEventTouchUpInside];
     [self.view addSubview:btnUploadInvoice];
     
-    [self addReceiptCollectionScrollView];
+    
     
     if(!isSubmitted)
     {
@@ -250,7 +260,7 @@
         txtAmount.text = @"";
         txtAmount.placeholder = @"enter amount";
         
-        description.text = @"";
+        txtDescription.text = @"";
     }
     else
     {
@@ -320,7 +330,11 @@
 - (void)TravelTypePickerDoneClick
 {
     NSInteger row = [travelTypePickerView selectedRowInComponent:0];
-    [btnTravelType setTitle:[travelTypes objectAtIndex:row] forState:UIControlStateNormal];
+    
+    //NSString *itemKey = [expenseTypes objectAtIndex:row];
+    //[dicExpenseTypes objectForKey:itemKey];
+    
+    [btnTravelType setTitle:[expenseTypes objectAtIndex:row] forState:UIControlStateNormal];
     [actionSheet dismissWithClickedButtonIndex:0 animated:YES];
 }
 
@@ -366,7 +380,7 @@
 }
 -(BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text
 {
-    [textView resignFirstResponder];
+    //[textView resignFirstResponder];
     
     return YES;
 }
@@ -463,7 +477,7 @@
     
     [actionSheet addSubview:travelTypePickerToolbar];
     [actionSheet addSubview:travelTypePickerView];
-    actionSheet.backgroundColor = [UIColor whiteColor];
+    actionSheet.backgroundColor = [UIColor colorWithRed:248/255.0f green:248/255.0f blue:248/255.0f alpha:1.0f];//[UIColor whiteColor];
     [actionSheet showInView:self.view];
     [actionSheet setBounds:CGRectMake(0,0,320, 464)];
 }
@@ -490,8 +504,7 @@
 // tell the picker how many rows are available for a given component
 - (NSInteger)pickerView:(UIPickerView *)pickerView numberOfRowsInComponent:(NSInteger)component {
     
-    
-    return [travelTypes count];
+    return [expenseTypes count];
 }
 
 // tell the picker how many components it will have
@@ -502,7 +515,7 @@
 // tell the picker the title for a given component
 - (NSString *)pickerView:(UIPickerView *)pickerView titleForRow:(NSInteger)row forComponent:(NSInteger)component {
     NSString *title;
-    title = [travelTypes objectAtIndex:row];
+    title = [expenseTypes objectAtIndex:row];
     
     return title;
 }
@@ -520,7 +533,7 @@
     
     pickerDate = [[UIDatePicker alloc] initWithFrame:CGRectMake(0.0, 44.0, 0.0, 0.0)];
     pickerDate.maximumDate = [NSDate date];
-    if(![APP_DELEGATE IsNullOrEmpty:btnExpenseSubmissionDate.titleLabel.text])
+    if(![Util IsNullOrEmpty:btnExpenseSubmissionDate.titleLabel.text])
     {
         NSDateFormatter *inputFormatter = [[NSDateFormatter alloc] init];
         inputFormatter.dateStyle = NSDateFormatterShortStyle;
@@ -554,7 +567,7 @@
     [pickerDateToolbar setItems:barItems animated:YES];
     
     [actionSheet addSubview:pickerDateToolbar];
-    actionSheet.backgroundColor = [UIColor whiteColor];
+    actionSheet.backgroundColor = [UIColor colorWithRed:248/255.0f green:248/255.0f blue:248/255.0f alpha:1.0f];//[UIColor whiteColor];
     [actionSheet addSubview:pickerDate];
     [actionSheet showInView:self.view];
     [actionSheet setBounds:CGRectMake(0,0,320, 464)];
@@ -573,11 +586,14 @@
     UIAlertView *alert =[[UIAlertView alloc] initWithTitle:@"Success" message:@"Expense details saved successfully." delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
     alert.tag = 1;
     [alert show];
+    
+    [self creatNewExpenses];
 }
 
 -(void)submit
 {
-    [self.navigationController popViewControllerAnimated:TRUE];
+    [self creatNewExpenses];
+    //[self.navigationController popViewControllerAnimated:TRUE];
 }
 
 -(void)showImage:(id) sender
@@ -596,6 +612,132 @@
     scan.title = @"Receipt";
     scan.image = nil;
     [self.navigationController pushViewController:scan animated:YES];
+}
+
+-(void)getExpenseTypeList
+{
+    NSString *URL = [BASE_URL stringByAppendingString:[NSString stringWithFormat:@"GetExpensetypes"]];
+    
+    AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
+    manager.responseSerializer = [AFJSONResponseSerializer serializer];
+    
+    [manager GET:URL parameters:nil success:^(NSURLSessionDataTask *task, id responseObject)
+     {
+         NSLog(@"responseObject = %@", responseObject);
+         NSArray *arrayJSON = (NSArray*)[responseObject valueForKeyPath:@"GetExpensetypesResult"];
+         //NSLog(@"responseObject = %@", [arrayJSON valueForKey:@"ExpenseID"]);
+         
+         for(NSDictionary *obj in arrayJSON)
+         {
+             [expenseTypes addObject:[obj objectForKey:@"CategoryName"]];
+             [dicExpenseTypes setObject:[obj objectForKey:@"ExpensetypeID"] forKey:[obj objectForKey:@"CategoryName"]];
+         }
+         
+     } failure:^(NSURLSessionDataTask *task, NSError *error) {
+         NSLog(@"error %@",error);
+         UIAlertView *alert =[[UIAlertView alloc] initWithTitle:@"Alert" message:[error description] delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+         [alert show];
+     }];
+}
+
+-(void)creatNewExpenses
+{
+    /*if([btnExpenseSubmissionDate.titleLabel.text isEqualToString:@"     select date"])
+    {
+        UIAlertView *alert =[[UIAlertView alloc] initWithTitle:@"Alert" message:@"please select submission date." delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+        [alert show];
+        return;
+    }
+    if([btnTravelType.titleLabel.text isEqualToString:@"          select travel type"])
+    {
+        UIAlertView *alert =[[UIAlertView alloc] initWithTitle:@"Alert" message:@"please select expense type." delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+        [alert show];
+        return;
+    }
+    if([Util IsNullOrEmpty:txtClientName.text])
+    {
+        UIAlertView *alert =[[UIAlertView alloc] initWithTitle:@"Alert" message:@"please enter client name." delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+        [alert show];
+        return;
+    }
+    if([Util IsNullOrEmpty:txtAmount.text])
+    {
+        UIAlertView *alert =[[UIAlertView alloc] initWithTitle:@"Alert" message:@"please enter amount" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+        [alert show];
+        return;
+    }*/
+    
+    NSDate *submissionDate = [Util convertStringToDate:btnExpenseSubmissionDate.titleLabel.text];
+    
+    NSNumber *expensetypeID = [dicExpenseTypes objectForKey:btnTravelType.titleLabel.text];
+    
+    ExpenseObject *expense =[[ExpenseObject alloc] init];
+    
+    expense.Address = @"gurgaon";
+    expense.Amount = [NSNumber numberWithFloat:123.00];//[txtAmount.text floatValue];
+    expense.CategoryName = @"testcat";
+    expense.ClientName = @"dfdfdf";//txtClientName.text;
+    expense.EmailID = [Util getUserEmailID];
+    expense.EmpID = [Util getUserId];
+    expense.EmpName = [Util getUserName];
+    expense.ExpenseID = [NSNumber numberWithInt:0];
+    expense.ExpenseNumber = @"1234";
+    expense.ExpenseSubmissionDate = [Util convertDateToJsonDate:submissionDate];
+    expense.ExpensetypeID = expensetypeID;
+    expense.ID = [NSNumber numberWithInt:0];
+    expense.Name = @"jitendra-rec";
+    expense.Notes = @"dsd";//txtDescription.text;
+    
+    NSURL *baseURL = [NSURL URLWithString:BASE_URL];
+    //NSURL *baseURL = [NSURL URLWithString:@"http://192.168.1.3:8088/HrmsService.svc/web/"];
+    
+    AFHTTPSessionManager *manager = [[AFHTTPSessionManager alloc] initWithBaseURL:baseURL];
+    manager.requestSerializer = [AFJSONRequestSerializer serializer];
+    AFJSONResponseSerializer *responseSerializer = [AFJSONResponseSerializer serializerWithReadingOptions:NSJSONReadingAllowFragments];
+    manager.responseSerializer = responseSerializer;
+    
+    [manager POST:@"CreateUpdateExpense" parameters:[expense toNSDictionary] success:^(NSURLSessionDataTask *task, id responseObject) {
+            NSLog(@"responseObject = %@", responseObject);
+        UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Success"
+                                                            message:@"Expense saved successfully"
+                                                           delegate:nil
+                                                  cancelButtonTitle:@"Ok"
+                                                  otherButtonTitles:nil];
+        [alertView show];
+        } failure:^(NSURLSessionDataTask *task, NSError *error) {
+            UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Error"
+                                                                message:[error localizedDescription]
+                                                               delegate:nil
+                                                      cancelButtonTitle:@"Ok"
+                                                      otherButtonTitles:nil];
+            [alertView show];
+        }];
+}
+
+-(void)uploadAttachment
+{
+    NSURL *URL = [NSURL URLWithString:BASE_URL];
+    NSURLSessionConfiguration *configuration = [NSURLSessionConfiguration defaultSessionConfiguration];
+    
+    AFHTTPSessionManager *manager = [[AFHTTPSessionManager alloc] initWithBaseURL:URL sessionConfiguration:configuration];
+    manager.responseSerializer = [AFJSONResponseSerializer serializer];
+    
+    if([APP_DELEGATE.arrayReceiptImages count] > 0)
+    {
+        for (int i = 0; i < [APP_DELEGATE.arrayReceiptImages count]; i++)
+        {
+            [manager POST:@"CreateExpenseItemAttachment" parameters:nil constructingBodyWithBlock:^(id<AFMultipartFormData> formData) {
+                //If you need to send image
+                UIImage *image = [APP_DELEGATE.arrayReceiptImages objectAtIndex:i];
+                [formData appendPartWithFileData:UIImageJPEGRepresentation(image, 0.5) name:@"Image" fileName:@"receipt.jpg" mimeType:@"image/jpeg"];
+                
+            } success:^(NSURLSessionDataTask *task, id responseObject) {
+                
+            } failure:^(NSURLSessionDataTask *task, NSError *error) {
+                
+            }];
+        }
+    }
 }
 
 - (IBAction)textFieldDone:(id)sender
