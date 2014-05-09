@@ -50,8 +50,9 @@
     if (expenseId == nil || [expenseId isEqual:[NSNull null]]) {
         expenseId = @"0";
     }
+    NSNumber *expID = [NSNumber numberWithInt:[expenseId integerValue]];
     NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
-    [prefs setObject:expenseId forKey:@"expenseId"];
+    [prefs setObject:expID forKey:@"expenseId"];
 }
 
 + (NSNumber *)getExpenseId

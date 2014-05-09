@@ -12,7 +12,8 @@
 #import "AFNetworking.h"
 #import "UIKit+AFNetworking.h"
 #import "Util.h"
-#import "UIKit+AFNetworking/UIImageView+AFNetworking.h"
+#import "ExpenseItemObject.h"
+#import "NSData+Base64.h"
 
 @interface ExpenseDetailsVC ()
 
@@ -291,7 +292,8 @@
         }
     }
     
-    [self getUserPhoto];
+    //[self getUserPhoto];
+    [self getReceiptImage];
 }
 
 -(void)getUserPhoto
@@ -322,6 +324,35 @@
              }
              
              NSData *data = [[NSData alloc]initWithBytes:bytes length:c];
+             UIImage *image = [UIImage imageWithData:data];
+             picture.image = image;
+         }
+         
+     } failure:^(NSURLSessionDataTask *task, NSError *error) {
+         NSLog(@"error %@",error);
+         UIAlertView *alert =[[UIAlertView alloc] initWithTitle:@"Alert" message:[error description] delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+         [alert show];
+     }];
+}
+
+-(void)getReceiptImage
+{
+    NSString *URL = [NSString stringWithFormat:@"%@GetAttachment?AttachmentID=3",BASE_URL];
+    
+    AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
+    manager.responseSerializer = [AFJSONResponseSerializer serializer];
+    
+    [manager GET:URL parameters:nil success:^(NSURLSessionDataTask *task, id responseObject)
+     {
+         NSLog(@"responseObject = %@", responseObject);
+         
+         NSArray *arrayJSON = (NSArray*)[responseObject valueForKeyPath:@"GetAttachmentResult"];
+         
+         for(NSDictionary *obj in arrayJSON)
+         {
+             NSString *imgStr = [obj objectForKey:@"byteFile"];
+             
+             NSData *data = [[NSData alloc] initWithData:[NSData dataFromBase64String:imgStr]];
              UIImage *image = [UIImage imageWithData:data];
              picture.image = image;
          }
@@ -545,6 +576,7 @@
     
     Scan *scan = [[Scan alloc] init];
     scan.title = @"Receipt";
+    scan.expenseItem = nil;
     scan.image = [info objectForKey:@"UIImagePickerControllerOriginalImage"];
     [self.navigationController pushViewController:scan animated:YES];
 }
@@ -642,16 +674,12 @@
 
 -(void)save
 {
-    UIAlertView *alert =[[UIAlertView alloc] initWithTitle:@"Success" message:@"Expense details saved successfully." delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
-    alert.tag = 1;
-    [alert show];
-    
     [self creatNewExpenses];
 }
 
 -(void)submit
 {
-    [self creatNewExpenses];
+    //[self creatNewExpenses];
     //[self.navigationController popViewControllerAnimated:TRUE];
 }
 
@@ -767,12 +795,15 @@
     [manager POST:@"CreateUpdateExpense" parameters:[expense toNSDictionary] success:^(NSURLSessionDataTask *task, id responseObject) {
             NSLog(@"responseObject = %@", responseObject);
             [Util setExpenseId:responseObject];
-        UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Success"
+        /*UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Success"
                                                             message:@"Expense saved successfully"
                                                            delegate:nil
                                                   cancelButtonTitle:@"Ok"
                                                   otherButtonTitles:nil];
-        [alertView show];
+        [alertView show];*/
+        
+        [self creatNewExpenseItem];
+        
         } failure:^(NSURLSessionDataTask *task, NSError *error) {
             UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Error"
                                                                 message:[error localizedDescription]
@@ -783,30 +814,80 @@
         }];
 }
 
--(void)uploadAttachment
+-(void)creatNewExpenseItem
 {
-    NSURL *URL = [NSURL URLWithString:BASE_URL];
-    NSURLSessionConfiguration *configuration = [NSURLSessionConfiguration defaultSessionConfiguration];
+    NSURL *baseURL = [NSURL URLWithString:BASE_URL];
+    //NSURL *baseURL = [NSURL URLWithString:@"http://192.168.1.3:8088/HrmsService.svc/web/"];
     
-    AFHTTPSessionManager *manager = [[AFHTTPSessionManager alloc] initWithBaseURL:URL sessionConfiguration:configuration];
-    manager.responseSerializer = [AFJSONResponseSerializer serializer];
+    AFHTTPSessionManager *manager = [[AFHTTPSessionManager alloc] initWithBaseURL:baseURL];
+    manager.requestSerializer = [AFJSONRequestSerializer serializer];
+    AFJSONResponseSerializer *responseSerializer = [AFJSONResponseSerializer serializerWithReadingOptions:NSJSONReadingAllowFragments];
+    manager.responseSerializer = responseSerializer;
     
-    if([APP_DELEGATE.arrayReceiptImages count] > 0)
+    
+    //if([APP_DELEGATE.arrayExpenseItems count] > 0)
     {
-        for (int i = 0; i < [APP_DELEGATE.arrayReceiptImages count]; i++)
+        //for (int i = 0; i < [APP_DELEGATE.arrayExpenseItems count]; i++)
         {
-            [manager POST:@"CreateExpenseItemAttachment" parameters:nil constructingBodyWithBlock:^(id<AFMultipartFormData> formData) {
-                //If you need to send image
-                UIImage *image = [APP_DELEGATE.arrayReceiptImages objectAtIndex:i];
-                [formData appendPartWithFileData:UIImageJPEGRepresentation(image, 0.5) name:@"Image" fileName:@"receipt.jpg" mimeType:@"image/jpeg"];
+            ExpenseItemObject *expenseItem = [APP_DELEGATE.arrayExpenseItems objectAtIndex:0];
+            expenseItem.ExpenseID = [Util getExpenseId];
+    
+            [manager POST:@"CreateExpenseItem" parameters:[expenseItem toNSDictionary] success:^(NSURLSessionDataTask *task, id responseObject) {
+                NSLog(@"responseObject = %@", responseObject);
+                expenseItem.ExpensemasterID = [NSNumber numberWithInt:[responseObject integerValue]];
+                UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Success"
+                                                                    message:@"Expense Item saved successfully"
+                                                                   delegate:nil
+                                                          cancelButtonTitle:@"Ok"
+                                                          otherButtonTitles:nil];
+                [alertView show];
                 
-            } success:^(NSURLSessionDataTask *task, id responseObject) {
+                [self uploadAttachment:expenseItem];
                 
             } failure:^(NSURLSessionDataTask *task, NSError *error) {
-                
+                UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Error"
+                                                                    message:[error localizedDescription]
+                                                                   delegate:nil
+                                                          cancelButtonTitle:@"Ok"
+                                                          otherButtonTitles:nil];
+                [alertView show];
             }];
         }
     }
+}
+
+-(void)uploadAttachment:(ExpenseItemObject*) expenseItemObject
+{
+    NSURL *baseURL = [NSURL URLWithString:BASE_URL];
+    AFHTTPSessionManager *manager = [[AFHTTPSessionManager alloc] initWithBaseURL:baseURL];
+    manager.requestSerializer = [AFJSONRequestSerializer serializer];
+    AFJSONResponseSerializer *responseSerializer = [AFJSONResponseSerializer serializerWithReadingOptions:NSJSONReadingAllowFragments];
+    manager.responseSerializer = responseSerializer;
+    
+    
+    expenseItemObject.AttachmentID = [NSNumber numberWithInt:-1];
+            
+            [manager POST:@"CreateExpenseItemAttachment" parameters:[expenseItemObject toNSDictionary] success:^(NSURLSessionDataTask *task, id responseObject) {
+                NSLog(@"responseObject = %@", responseObject);
+                UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Success"
+                                                                    message:@"Expense Item saved successfully"
+                                                                   delegate:nil
+                                                          cancelButtonTitle:@"Ok"
+                                                          otherButtonTitles:nil];
+                [alertView show];
+                
+                
+                
+            } failure:^(NSURLSessionDataTask *task, NSError *error) {
+                UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Error"
+                                                                    message:[error localizedDescription]
+                                                                   delegate:nil
+                                                          cancelButtonTitle:@"Ok"
+                                                          otherButtonTitles:nil];
+                [alertView show];
+            }];
+    
+    
 }
 
 - (IBAction)textFieldDone:(id)sender

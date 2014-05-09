@@ -9,11 +9,12 @@
 #import "AppDelegate.h"
 
 @implementation AppDelegate
-@synthesize navController,arrayReceiptImages;
+@synthesize navController,arrayReceiptImages,arrayExpenseItems;
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     self.arrayReceiptImages = [[NSMutableArray alloc] init];
+    self.arrayExpenseItems = [[NSMutableArray alloc] init];
     
     lvc = [[LoginVC alloc] init];
     lvc.title = @"Cloudeeva - Login";

@@ -30,6 +30,8 @@
 		A303441C18EC08C200CB8DC5 /* box_with_arrow.png in Resources */ = {isa = PBXBuildFile; fileRef = A303441B18EC08C200CB8DC5 /* box_with_arrow.png */; };
 		A303441E18EC0D9900CB8DC5 /* dropdown.png in Resources */ = {isa = PBXBuildFile; fileRef = A303441D18EC0D9900CB8DC5 /* dropdown.png */; };
 		A374F72919162CDD00C62373 /* Util.m in Sources */ = {isa = PBXBuildFile; fileRef = A374F72819162CDD00C62373 /* Util.m */; };
+		A38E0F7D191C6AEB00C7AEC2 /* ExpenseItemObject.m in Sources */ = {isa = PBXBuildFile; fileRef = A38E0F7C191C6AEB00C7AEC2 /* ExpenseItemObject.m */; };
+		A38E0F80191D315B00C7AEC2 /* NSData+Base64.m in Sources */ = {isa = PBXBuildFile; fileRef = A38E0F7E191D315B00C7AEC2 /* NSData+Base64.m */; };
 		A3DBA16C18EA8B86006250EA /* signin.png in Resources */ = {isa = PBXBuildFile; fileRef = A3DBA16B18EA8B86006250EA /* signin.png */; };
 		A3ED0A0318E96ED4001547D2 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A3ED0A0218E96ED4001547D2 /* Foundation.framework */; };
 		A3ED0A0518E96ED4001547D2 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A3ED0A0418E96ED4001547D2 /* CoreGraphics.framework */; };
@@ -108,6 +110,10 @@
 		A303441D18EC0D9900CB8DC5 /* dropdown.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = dropdown.png; sourceTree = "<group>"; };
 		A374F72719162CDD00C62373 /* Util.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Util.h; sourceTree = "<group>"; };
 		A374F72819162CDD00C62373 /* Util.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Util.m; sourceTree = "<group>"; };
+		A38E0F7B191C6AEB00C7AEC2 /* ExpenseItemObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExpenseItemObject.h; sourceTree = "<group>"; };
+		A38E0F7C191C6AEB00C7AEC2 /* ExpenseItemObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ExpenseItemObject.m; sourceTree = "<group>"; };
+		A38E0F7E191D315B00C7AEC2 /* NSData+Base64.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSData+Base64.m"; sourceTree = "<group>"; };
+		A38E0F7F191D315B00C7AEC2 /* NSData+Base64.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSData+Base64.h"; sourceTree = "<group>"; };
 		A3DBA16B18EA8B86006250EA /* signin.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = signin.png; sourceTree = "<group>"; };
 		A3ED09FF18E96ED3001547D2 /* expenses.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = expenses.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A3ED0A0218E96ED4001547D2 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -244,6 +250,8 @@
 				A3ED0A4418E99338001547D2 /* Scan.m */,
 				568EB07A190E7D3700FAEE01 /* ExpenseObject.h */,
 				568EB07B190E7D3700FAEE01 /* ExpenseObject.m */,
+				A38E0F7B191C6AEB00C7AEC2 /* ExpenseItemObject.h */,
+				A38E0F7C191C6AEB00C7AEC2 /* ExpenseItemObject.m */,
 			);
 			name = ViewControllers;
 			sourceTree = "<group>";
@@ -251,6 +259,8 @@
 		A374F72619162CAD00C62373 /* Util */ = {
 			isa = PBXGroup;
 			children = (
+				A38E0F7E191D315B00C7AEC2 /* NSData+Base64.m */,
+				A38E0F7F191D315B00C7AEC2 /* NSData+Base64.h */,
 				A374F72719162CDD00C62373 /* Util.h */,
 				A374F72819162CDD00C62373 /* Util.m */,
 			);
@@ -437,6 +447,7 @@
 			files = (
 				56A3D309190FC8D000E4D839 /* UIRefreshControl+AFNetworking.m in Sources */,
 				56A3D2FF190FC8D000E4D839 /* AFURLConnectionOperation.m in Sources */,
+				A38E0F7D191C6AEB00C7AEC2 /* ExpenseItemObject.m in Sources */,
 				A3ED0A1918E96ED4001547D2 /* ExpensesListVC.m in Sources */,
 				56A3D308190FC8D000E4D839 /* UIProgressView+AFNetworking.m in Sources */,
 				568EB07C190E7D3700FAEE01 /* ExpenseObject.m in Sources */,
@@ -451,6 +462,7 @@
 				56A3D303190FC8D000E4D839 /* AFNetworkActivityIndicatorManager.m in Sources */,
 				56A3D2FE190FC8D000E4D839 /* AFSecurityPolicy.m in Sources */,
 				56A3D2FA190FC8D000E4D839 /* AFHTTPRequestOperation.m in Sources */,
+				A38E0F80191D315B00C7AEC2 /* NSData+Base64.m in Sources */,
 				56A3D302190FC8D000E4D839 /* AFURLSessionManager.m in Sources */,
 				A3ED0A3918E97079001547D2 /* LoginVC.m in Sources */,
 				A3ED0A4518E99338001547D2 /* Scan.m in Sources */,
