@@ -43,5 +43,6 @@
 + (NSNumber *)getUserPhotoId;
 + (void)setExpenseId:(NSString *)expenseId;
 + (NSNumber *)getExpenseId;
++(NSDate*) dateFromDotNet:(NSString*)stringDate;
 
 @end

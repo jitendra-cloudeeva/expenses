@@ -19,16 +19,16 @@
 
 - (void)viewDidLoad
 {
-    [APP_DELEGATE.arrayReceiptImages removeAllObjects];
+    [APP_DELEGATE.arrayExpenseItems removeAllObjects];
     
     self.view.backgroundColor = [UIColor colorWithRed:165/255.0f green:217/255.0f blue:235/255.0f alpha:1.0f];
     
     arraySavedExpenses = [[NSMutableArray alloc] init];
-    [arraySavedExpenses addObject:@"Trip to Gurgaon"];
+    /*[arraySavedExpenses addObject:@"Trip to Gurgaon"];
     [arraySavedExpenses addObject:@"Hyderabad Visit"];
     [arraySavedExpenses addObject:@"USA Office Visit"];
     [arraySavedExpenses addObject:@"Delhi Office Expenses"];
-    [arraySavedExpenses addObject:@"Bangalore Expenses"];
+    [arraySavedExpenses addObject:@"Bangalore Expenses"];*/
     
     arraySubmittedExpenses = [[NSMutableArray alloc] init];
     /*[arraySubmittedExpenses addObject:@"2013 Delhi Office Visit"];
@@ -89,8 +89,17 @@
              expense.ExpensetypeID = [obj objectForKey:@"ExpensetypeID"];
              expense.Name = [obj objectForKey:@"Name"];
              expense.Notes = [obj objectForKey:@"Notes"];
+             expense.Status = [obj objectForKey:@"Status"];
              
-             [arraySubmittedExpenses addObject:expense];
+             if([expense.Status integerValue] > -1)
+             {
+                 [arraySubmittedExpenses addObject:expense];
+             }
+             else
+             {
+                 [arraySavedExpenses addObject:expense];
+             }
+             
              [tView reloadData];
          }
          
@@ -113,8 +122,9 @@
     ExpenseDetailsVC *edvc = [[ExpenseDetailsVC alloc] init];
     edvc.title = @"New Expense";
     edvc.isNew = TRUE;
-    [APP_DELEGATE.arrayReceiptImages removeAllObjects];
+    [APP_DELEGATE.arrayExpenseItems removeAllObjects];
     edvc.isSubmitted = FALSE;
+    edvc.expenseObj = nil;
     [self.navigationController pushViewController:edvc animated:YES];
 }
 
@@ -161,7 +171,8 @@
     
     if(indexPath.section == 0)
     {
-        label.text = [NSString stringWithFormat:@"%@", [arraySavedExpenses objectAtIndex:indexPath.row]];
+        ExpenseObject *ee = [arraySavedExpenses objectAtIndex:indexPath.row];
+        label.text = ee.ExpenseNumber;
     }
     else
     {
@@ -217,9 +228,10 @@
     
     if (indexPath.section == 0)
     {
-        [APP_DELEGATE.arrayReceiptImages removeAllObjects];
         edvc.isSubmitted = FALSE;
-        edvc.title = [arraySavedExpenses objectAtIndex:indexPath.row];
+        ExpenseObject *expense = [arraySavedExpenses objectAtIndex:indexPath.row];
+        edvc.title = expense.ExpenseNumber;
+        edvc.expenseObj = expense;
     }
     else
     {

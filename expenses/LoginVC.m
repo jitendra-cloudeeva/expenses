@@ -132,6 +132,14 @@
     [manager GET:URL parameters:nil success:^(NSURLSessionDataTask *task, id responseObject)
     {
         NSLog(@"responseObject = %@", responseObject);
+        
+        if(responseObject == nil || [responseObject isEqual:[NSNull null]])
+        {
+            UIAlertView *alert =[[UIAlertView alloc] initWithTitle:@"Alert" message:@"Invalid username or password, try again." delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+            [alert show];
+            return;
+        }
+        
         NSArray *dd = (NSArray*)responseObject;
         NSDictionary *dicJSON = dd[0];
         
@@ -152,7 +160,7 @@
         
     } failure:^(NSURLSessionDataTask *task, NSError *error) {
         NSLog(@"error %@",error);
-        UIAlertView *alert =[[UIAlertView alloc] initWithTitle:@"Alert" message:@"Invalid username or password, try again." delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+        UIAlertView *alert =[[UIAlertView alloc] initWithTitle:@"Error" message:@"Network error, can't connect to the server, try again." delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
         [alert show];
     }];
 }

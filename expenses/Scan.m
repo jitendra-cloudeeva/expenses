@@ -10,9 +10,10 @@
 #import "AppDelegate.h"
 #import "Util.h"
 #import "ExpenseItemObject.h"
+#import "NSData+Base64.h"
 
 @implementation Scan
-@synthesize imagePickerController, imageView, image, imageButtonIndex,currentKBType, curTextField,expenseItem;
+@synthesize imagePickerController, imageView, image, expenseItemIndex,currentKBType, curTextField;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -57,7 +58,6 @@
     txtExpenseItemName = [[UITextField alloc] initWithFrame:CGRectMake(147, 70, 160, 25)];
 	txtExpenseItemName.font = [UIFont systemFontOfSize:12];
     txtExpenseItemName.tag = 1;
-    //txtExpenseItemName.text = expenseObj.ClientName;
     txtExpenseItemName.textColor = [UIColor blackColor];
 	txtExpenseItemName.borderStyle = UITextBorderStyleLine;
     txtExpenseItemName.backgroundColor = [UIColor whiteColor];
@@ -99,7 +99,6 @@
     txtAmount = [[UITextField alloc] initWithFrame:CGRectMake(72, 130, 235, 25)];
 	txtAmount.font = [UIFont systemFontOfSize:12];
     txtAmount.tag = 2;
-    //txtAmount.text = [expenseObj.Amount stringValue];
     txtAmount.textColor = [UIColor blackColor];
 	txtAmount.borderStyle = UITextBorderStyleLine;
     txtAmount.backgroundColor = [UIColor whiteColor];
@@ -122,7 +121,6 @@
     txtDescription.backgroundColor = [UIColor whiteColor];
     txtDescription.layer.borderColor=[[UIColor lightGrayColor]CGColor];
     txtDescription.layer.borderWidth= 1.0f;
-    txtDescription.text = @"Cloudeeva Inc.";
     txtDescription.scrollEnabled = YES;
     txtDescription.pagingEnabled = YES;
     txtDescription.editable = YES;
@@ -151,15 +149,63 @@
     
     imageView.image = image;
     
-    if(expenseItem)
+    if(expenseItemIndex > -1)
     {
-        UIBarButtonItem *itemright = [[UIBarButtonItem alloc] initWithTitle:@"Remove" style:UIBarButtonItemStylePlain target:self action:@selector(RemoveImage)];
-        self.navigationItem.rightBarButtonItem = itemright;
+        if([expenseItemObj.AttachmentID integerValue] > -1)
+        {
+            UIBarButtonItem *itemright = [[UIBarButtonItem alloc] initWithTitle:@"Remove" style:UIBarButtonItemStylePlain target:self action:@selector(RemoveImage)];
+            self.navigationItem.rightBarButtonItem = itemright;
+        }
+        
+        expenseItemObj = [APP_DELEGATE.arrayExpenseItems objectAtIndex:expenseItemIndex];
+        
+        if(expenseItemObj.Expensename == nil || [expenseItemObj.Expensename isEqual:[NSNull null]])
+        {
+            txtExpenseItemName.text = @"";
+        }
+        else
+        {
+            txtExpenseItemName.text = expenseItemObj.Expensename;
+        }
+        
+        NSDate *submissionDate = [Util dateFromDotNet:expenseItemObj.ExpenseDate];
+        
+        NSDateFormatter *outputFormatter = [[NSDateFormatter alloc] init];
+        [outputFormatter setDateFormat:@"dd-MM-yyyy"];
+        [btnExpenseSubmissionDate setTitle:[outputFormatter stringFromDate:submissionDate] forState:UIControlStateNormal];
+        
+        if(expenseItemObj.Amount == nil || [expenseItemObj.Amount isEqual:[NSNull null]])
+        {
+            txtAmount.text = @"0.0";
+        }
+        else
+        {
+            txtAmount.text = [expenseItemObj.Amount stringValue];
+        }
+        if(expenseItemObj.Notes == nil || [expenseItemObj.Notes isEqual:[NSNull null]])
+        {
+            txtDescription.text = @"";
+        }
+        else
+        {
+            txtDescription.text = expenseItemObj.Notes;
+        }
+        
+        NSData *data = [[NSData alloc] initWithData:[NSData dataFromBase64String:expenseItemObj.byteFile]];
+        UIImage *receiptImage = [UIImage imageWithData:data];
+        imageView.image = receiptImage;
     }
     else
     {
         UIBarButtonItem *itemright = [[UIBarButtonItem alloc] initWithTitle:@"Add" style:UIBarButtonItemStylePlain target:self action:@selector(uploadImage)];
         self.navigationItem.rightBarButtonItem = itemright;
+        
+        txtExpenseItemName.text = @"";
+        txtExpenseItemName.placeholder = @"enter expense name";
+        [btnExpenseSubmissionDate setTitle:@"     select date" forState:UIControlStateNormal];
+        txtAmount.text = @"";
+        txtAmount.placeholder = @"enter amount";
+        txtDescription.text = @"";
         
         toolbar.items = [NSArray arrayWithObjects:
                          [[UIBarButtonItem alloc]initWithTitle:@"Choose Picture" style:UIBarButtonItemStyleDone target:self action:@selector(getPhotoFromAlbum)],
@@ -280,13 +326,11 @@
 
 - (void)RemoveImage
 {
-    if(image)
-    {
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Alert" message:@"Do you really want to delete this image?" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:@"Cancel", nil];
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Alert" message:@"Do you really want to delete this record?" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:@"Cancel", nil];
         alert.tag = 2;
         [alert show];
         return;
-    }
+    
 }
 
 -(void) getPhotoFromAlbum
@@ -361,7 +405,7 @@
     {
         if(buttonIndex == 0)
         {
-            [APP_DELEGATE.arrayReceiptImages removeObjectAtIndex:imageButtonIndex];
+            [APP_DELEGATE.arrayExpenseItems removeObjectAtIndex:expenseItemIndex];
             [self.navigationController popViewControllerAnimated:TRUE];
         }
     }
@@ -369,7 +413,7 @@
 
 -(void)addExpenseItem
 {
-    /*if([Util IsNullOrEmpty:txtExpenseItemName.text])
+    if([Util IsNullOrEmpty:txtExpenseItemName.text])
     {
         UIAlertView *alert =[[UIAlertView alloc] initWithTitle:@"Alert" message:@"please enter item name." delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
         [alert show];
@@ -392,19 +436,22 @@
         UIAlertView *alert =[[UIAlertView alloc] initWithTitle:@"Alert" message:@"please enter description." delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
         [alert show];
         return;
-    }*/
+    }
     
     NSDate *submissionDate = [Util convertStringToDate:btnExpenseSubmissionDate.titleLabel.text];
     
-    ExpenseItemObject *expenseItemObj =[[ExpenseItemObject alloc] initWithCode];
+    if(expenseItemObj == nil || [expenseItemObj isEqual:[NSNull null]])
+    {
+        expenseItemObj =[[ExpenseItemObject alloc] initWithCode];
+    }
     
     expenseItemObj.EmpID = [Util getUserId];
-    //expenseItemObj.ExpenseID = [Util getExpenseId];
     expenseItemObj.ExpensemasterID = [NSNumber numberWithInt:-1];
-    expenseItemObj.Expensename = @"new jit expense";//txtExpenseItemName.text;
+    expenseItemObj.Expensename = txtExpenseItemName.text;
     expenseItemObj.ExpenseDate = [Util convertDateToJsonDate:submissionDate];
-    expenseItemObj.Amount = [NSNumber numberWithFloat:123.00];//[txtAmount.text floatValue];
-    expenseItemObj.Description = @"descrip12"; //txtDescription.text;
+    expenseItemObj.Amount = [NSNumber numberWithFloat:[txtAmount.text floatValue]];
+    expenseItemObj.Description = txtDescription.text;
+    expenseItemObj.Notes = txtDescription.text;
     
     NSData *data = UIImagePNGRepresentation(image);
     NSString *byteArray  = [data base64Encoding];//[data base64EncodedStringWithOptions:NSDataBase64Encoding64CharacterLineLength];

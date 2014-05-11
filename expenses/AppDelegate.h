@@ -22,13 +22,11 @@
 {
     LoginVC *lvc;
     UINavigationController *navController;
-    NSMutableArray *arrayReceiptImages;
     NSMutableArray *arrayExpenseItems;
 }
 
 @property (strong, nonatomic) UIWindow *window;
 @property (strong, nonatomic) UINavigationController *navController;
-@property (strong, nonatomic) NSMutableArray *arrayReceiptImages;
 @property (strong, nonatomic) NSMutableArray *arrayExpenseItems;
 
 

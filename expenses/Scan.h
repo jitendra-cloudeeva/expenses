@@ -16,7 +16,7 @@
     UIImageView *imageView;
     BOOL hasImage;
     UIImage *image;
-    int imageButtonIndex;
+    int expenseItemIndex;
     UITextField *txtExpenseItemName;
     UIButton *btnExpenseSubmissionDate;
     UITextField *txtAmount;
@@ -27,16 +27,16 @@
     
     UIDatePicker *pickerDate;
     UIActionSheet *actionSheet;
-    ExpenseItemObject *expenseItem;
+    ExpenseItemObject *expenseItemObj;
 }
 
 @property(nonatomic,strong)UIImagePickerController *imagePickerController;
 @property(nonatomic,strong)UIImageView *imageView;
 @property(nonatomic,strong)UIImage *image;
-@property(assign) int imageButtonIndex;
+@property(assign) int expenseItemIndex;
 @property (nonatomic) UIKeyboardType currentKBType;
 @property(nonatomic,strong) UITextField *curTextField;
-@property(nonatomic,strong) ExpenseItemObject *expenseItem;
+
 
 - (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker;
 

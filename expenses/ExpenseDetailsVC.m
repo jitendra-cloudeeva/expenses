@@ -48,6 +48,19 @@
 {
     [self addReceiptCollectionScrollView];
     
+    float sum = 0.00;
+    
+    if([APP_DELEGATE.arrayExpenseItems count] > 0)
+    {
+        for (int i = 0; i < [APP_DELEGATE.arrayExpenseItems count]; i++)
+        {
+            ExpenseItemObject *expenseItem = [APP_DELEGATE.arrayExpenseItems objectAtIndex:i];
+            sum = sum + [expenseItem.Amount floatValue];
+        }
+    }
+    
+    txtAmount.text = [NSString stringWithFormat:@"%.2f", sum];
+    
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShowNotification:) name:UIKeyboardWillShowNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillHideNotification:) name:UIKeyboardWillHideNotification object:nil];
 }
@@ -58,7 +71,7 @@
     self.view.backgroundColor = [UIColor colorWithRed:165/255.0f green:217/255.0f blue:235/255.0f alpha:1.0f];
     
     picture = [[UIImageView alloc] initWithFrame:CGRectMake(15, 70, 90, 90)];
-    picture.image = [UIImage imageNamed:@"jitu.png"];
+    picture.image = [UIImage imageNamed:@"person.png"];
     [self.view addSubview:picture];
     
     UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(115, 70, 70, 30)];
@@ -112,7 +125,6 @@
     
     btnExpenseSubmissionDate = [UIButton buttonWithType:UIButtonTypeCustom];
     [btnExpenseSubmissionDate setFrame:CGRectMake(195, 163, 115, 25)];
-    
     [btnExpenseSubmissionDate setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
     btnExpenseSubmissionDate.titleLabel.font = [UIFont systemFontOfSize:12];
     [[btnExpenseSubmissionDate layer] setBorderWidth:1.0f];
@@ -131,7 +143,6 @@
     
     btnTravelType = [UIButton buttonWithType:UIButtonTypeCustom];
     [btnTravelType setFrame:CGRectMake(120, 192, 190, 25)];
-    [btnTravelType setTitle:@"          select travel type" forState:UIControlStateNormal];
     [btnTravelType setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
     btnTravelType.titleLabel.font = [UIFont systemFontOfSize:12];
     [[btnTravelType layer] setBorderWidth:1.0f];
@@ -151,7 +162,6 @@
     txtClientName = [[UITextField alloc] initWithFrame:CGRectMake(120, 220, 190, 30)];
 	txtClientName.font = [UIFont systemFontOfSize:12];
     txtClientName.tag = 2;
-    txtClientName.text = expenseObj.ClientName;
     txtClientName.textColor = [UIColor blackColor];
 	txtClientName.borderStyle = UITextBorderStyleLine;
     txtClientName.backgroundColor = [UIColor whiteColor];
@@ -174,7 +184,6 @@
     txtClientAddress = [[UITextField alloc] initWithFrame:CGRectMake(120, 253, 190, 30)];
 	txtClientAddress.font = [UIFont systemFontOfSize:12];
     txtClientAddress.tag = 2;
-    txtClientAddress.text = expenseObj.ClientAddress;
     txtClientAddress.textColor = [UIColor blackColor];
 	txtClientAddress.borderStyle = UITextBorderStyleLine;
     txtClientAddress.backgroundColor = [UIColor whiteColor];
@@ -198,7 +207,6 @@
     txtDescription.backgroundColor = [UIColor whiteColor];
     txtDescription.layer.borderColor=[[UIColor lightGrayColor]CGColor];
     txtDescription.layer.borderWidth= 1.0f;
-    txtDescription.text = @"Cloudeeva Inc.";
     txtDescription.scrollEnabled = YES;
     txtDescription.pagingEnabled = YES;
     txtDescription.editable = YES;
@@ -219,7 +227,6 @@
     txtAmount = [[UITextField alloc] initWithFrame:CGRectMake(120, 330, 190, 30)];
 	txtAmount.font = [UIFont systemFontOfSize:12];
     txtAmount.tag = 3;
-    txtAmount.text = [expenseObj.Amount stringValue];
     txtAmount.textColor = [UIColor blackColor];
 	txtAmount.borderStyle = UITextBorderStyleLine;
     txtAmount.backgroundColor = [UIColor whiteColor];
@@ -236,18 +243,23 @@
     [btnUploadInvoice setTitle:@"Upload Invoice" forState:UIControlStateNormal];
     [btnUploadInvoice setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
     btnUploadInvoice.titleLabel.font = [UIFont boldSystemFontOfSize:15];
-    
     btnUploadInvoice.layer.cornerRadius = 4;
     btnUploadInvoice.layer.borderWidth = 1;
     btnUploadInvoice.layer.borderColor = [UIColor blackColor].CGColor;
+    btnUploadInvoice.hidden = TRUE;
     
-    //[btnUploadInvoice setImage:[UIImage imageNamed:@"invoice.png"] forState:UIControlStateNormal];
-    [btnUploadInvoice addTarget:self action:@selector(showPictureOptions) forControlEvents:UIControlEventTouchUpInside];
-    [self.view addSubview:btnUploadInvoice];
+    receiptCollectionScrollView = [[UIScrollView alloc]initWithFrame:CGRectMake(0, btnUploadInvoice.frame.origin.y + 28, 320, 40)];
+    receiptCollectionScrollView.showsVerticalScrollIndicator=YES;
+    receiptCollectionScrollView.scrollEnabled=YES;
+    receiptCollectionScrollView.userInteractionEnabled=YES;
+    [self.view addSubview:receiptCollectionScrollView];
+    receiptCollectionScrollView.contentSize = CGSizeMake(320,300);
     
-    
-    
-    if(!isSubmitted)
+    if(self.expenseObj != nil  && ([expenseObj.Status integerValue] > -1))
+    {
+        
+    }
+    else
     {
         CGRect frame, remain;
         CGRectDivide(self.view.bounds, &frame, &remain, 44, CGRectMaxYEdge);
@@ -264,36 +276,73 @@
         toolbar.barTintColor = [UIColor colorWithRed:50/255.0f green:134/255.0f blue:221/255.0f alpha:1.0f];//[UIColor colorWithRed:47/255.0f green:177/255.0f blue:241/255.0f alpha:1.0f];
         
         [self.view addSubview:toolbar];
+        
+        btnUploadInvoice.hidden = FALSE;
+        
+        //[btnUploadInvoice setImage:[UIImage imageNamed:@"invoice.png"] forState:UIControlStateNormal];
+        [btnUploadInvoice addTarget:self action:@selector(showPictureOptions) forControlEvents:UIControlEventTouchUpInside];
+        [self.view addSubview:btnUploadInvoice];
     }
     
-    if(isNew)
+    if(self.expenseObj == nil)
     {
         [btnExpenseSubmissionDate setTitle:@"     select date" forState:UIControlStateNormal];
         [btnTravelType setTitle:@"          select travel type" forState:UIControlStateNormal];
-        
         txtClientName.text = @"";
         txtClientName.placeholder = @"enter client name";
+        txtClientAddress.text = @"";
         txtClientAddress.placeholder = @"enter client address";
-        
+        txtDescription.text = @"";
         txtAmount.text = @"";
         txtAmount.placeholder = @"enter amount";
-        
-        txtDescription.text = @"";
     }
     else
     {
+        NSDate *submissionDate = (NSDate*)expenseObj.ExpenseSubmissionDate;
         NSDateFormatter *outputFormatter = [[NSDateFormatter alloc] init];
         [outputFormatter setDateFormat:@"dd-MM-yyyy"];
-        [btnExpenseSubmissionDate setTitle:[outputFormatter stringFromDate:[NSDate date]] forState:UIControlStateNormal];
+        [btnExpenseSubmissionDate setTitle:[outputFormatter stringFromDate:submissionDate] forState:UIControlStateNormal];
         
-        if(isSubmitted)
+        if(expenseObj.ClientName == nil || [expenseObj.ClientName isEqual:[NSNull null]])
         {
-            btnUploadInvoice.hidden = TRUE;
+            txtClientName.text = @"";
         }
+        else
+        {
+            txtClientName.text = expenseObj.ClientName;
+        }
+        
+        if(expenseObj.ClientAddress == nil || [expenseObj.ClientAddress isEqual:[NSNull null]])
+        {
+            txtClientAddress.text = @"";
+        }
+        else
+        {
+            txtClientAddress.text = expenseObj.ClientAddress;
+        }
+        
+        if(expenseObj.Notes == nil || [expenseObj.Notes isEqual:[NSNull null]])
+        {
+            txtDescription.text = @"";
+        }
+        else
+        {
+            txtDescription.text = expenseObj.Notes;
+        }
+        
+        if(expenseObj.Amount == nil || [expenseObj.Amount isEqual:[NSNull null]])
+        {
+            txtAmount.text = @"0.0";
+        }
+        else
+        {
+            txtAmount.text = [expenseObj.Amount stringValue];
+        }
+        
+        [self getExpenseItemList];
     }
     
-    //[self getUserPhoto];
-    [self getReceiptImage];
+    [self getUserPhoto];
 }
 
 -(void)getUserPhoto
@@ -335,26 +384,32 @@
      }];
 }
 
--(void)getReceiptImage
+-(void)getReceiptImage:(ExpenseItemObject*)expenseItem
 {
-    NSString *URL = [NSString stringWithFormat:@"%@GetAttachment?AttachmentID=3",BASE_URL];
+    NSString *URL = [NSString stringWithFormat:@"%@GetAttachment?AttachmentID=%@",BASE_URL, [expenseItem.AttachmentID stringValue]];
     
     AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
     manager.responseSerializer = [AFJSONResponseSerializer serializer];
     
     [manager GET:URL parameters:nil success:^(NSURLSessionDataTask *task, id responseObject)
      {
-         NSLog(@"responseObject = %@", responseObject);
+         NSLog(@"receipt image = %@", responseObject);
          
          NSArray *arrayJSON = (NSArray*)[responseObject valueForKeyPath:@"GetAttachmentResult"];
          
          for(NSDictionary *obj in arrayJSON)
          {
-             NSString *imgStr = [obj objectForKey:@"byteFile"];
+             expenseItem.byteFile = [obj objectForKey:@"byteFile"];
              
-             NSData *data = [[NSData alloc] initWithData:[NSData dataFromBase64String:imgStr]];
+             NSData *data = [[NSData alloc] initWithData:[NSData dataFromBase64String:expenseItem.byteFile]];
              UIImage *image = [UIImage imageWithData:data];
-             picture.image = image;
+             
+             UIButton *btnPicture = [UIButton buttonWithType:UIButtonTypeCustom];
+             btnPicture.tag = [expenseItem.AttachmentID integerValue] - 1;
+             [btnPicture setFrame:CGRectMake(btnPicture.tag * 45 , 0, 40, 40)];
+             [btnPicture setImage:image forState:UIControlStateNormal];
+             [btnPicture addTarget:self action:@selector(showReceiptDetails:) forControlEvents:UIControlEventTouchUpInside];
+             [receiptCollectionScrollView addSubview:btnPicture];
          }
          
      } failure:^(NSURLSessionDataTask *task, NSError *error) {
@@ -379,15 +434,20 @@
     [self.view addSubview:receiptCollectionScrollView];
     receiptCollectionScrollView.contentSize = CGSizeMake(320,300);
     
-    if([APP_DELEGATE.arrayReceiptImages count] > 0)
+    if([APP_DELEGATE.arrayExpenseItems count] > 0)
     {
-        for (int i = 0; i < [APP_DELEGATE.arrayReceiptImages count]; i++)
+        for (int i = 0; i < [APP_DELEGATE.arrayExpenseItems count]; i++)
         {
+            ExpenseItemObject *expenseItem = [APP_DELEGATE.arrayExpenseItems objectAtIndex:i];
+            
+            NSData *data = [[NSData alloc] initWithData:[NSData dataFromBase64String:expenseItem.byteFile]];
+            UIImage *image = [UIImage imageWithData:data];
+            
             UIButton *btnPicture = [UIButton buttonWithType:UIButtonTypeCustom];
             btnPicture.tag = i;
             [btnPicture setFrame:CGRectMake(i * 45 , 0, 40, 40)];
-            [btnPicture setImage:[APP_DELEGATE.arrayReceiptImages objectAtIndex:i] forState:UIControlStateNormal];
-            [btnPicture addTarget:self action:@selector(showImage:) forControlEvents:UIControlEventTouchUpInside];
+            [btnPicture setImage:image forState:UIControlStateNormal];
+            [btnPicture addTarget:self action:@selector(showReceiptDetails:) forControlEvents:UIControlEventTouchUpInside];
             [receiptCollectionScrollView addSubview:btnPicture];
         }
     }
@@ -571,12 +631,11 @@
 {
 	[picker dismissViewControllerAnimated:YES completion:nil];
     imagePickerController.view.hidden = YES;
-    [APP_DELEGATE.arrayReceiptImages addObject:[info objectForKey:@"UIImagePickerControllerOriginalImage"]];
     [self addReceiptCollectionScrollView];
     
     Scan *scan = [[Scan alloc] init];
     scan.title = @"Receipt";
-    scan.expenseItem = nil;
+    scan.expenseItemIndex = -1;
     scan.image = [info objectForKey:@"UIImagePickerControllerOriginalImage"];
     [self.navigationController pushViewController:scan animated:YES];
 }
@@ -683,23 +742,82 @@
     //[self.navigationController popViewControllerAnimated:TRUE];
 }
 
--(void)showImage:(id) sender
+-(void)showReceiptDetails:(id) sender
 {
     UIButton *btn = (UIButton *) sender;
     Scan *scan = [[Scan alloc] init];
     scan.title = @"Receipt";
-    scan.image = btn.imageView.image;
-    scan.imageButtonIndex = btn.tag;
+    scan.expenseItemIndex = btn.tag;
     [self.navigationController pushViewController:scan animated:YES];
 }
 
--(void)uploadInvoice
+-(void)getExpenseItemList
 {
-    Scan *scan = [[Scan alloc] init];
-    scan.title = @"Receipt";
-    scan.image = nil;
-    [self.navigationController pushViewController:scan animated:YES];
+    NSDictionary *parameters = [NSDictionary dictionaryWithObjectsAndKeys:expenseObj.ExpenseID, @"ExpenseID", nil];
+    
+    NSString *URL = [BASE_URL stringByAppendingString:[NSString stringWithFormat:@"GetExpenseitems"]];
+    
+    AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
+    manager.responseSerializer = [AFJSONResponseSerializer serializer];
+    
+    [manager GET:URL parameters:parameters success:^(NSURLSessionDataTask *task, id responseObject)
+     {
+         for (int i = 1; i < 6; i++)
+         {
+             ExpenseItemObject *expenseItemObj =[[ExpenseItemObject alloc] init];
+             
+             expenseItemObj.AttachmentID = [NSNumber numberWithInt:i];
+             
+             [APP_DELEGATE.arrayExpenseItems addObject:expenseItemObj];
+             
+             [self getReceiptImage:expenseItemObj];
+         }
+         
+     } failure:^(NSURLSessionDataTask *task, NSError *error) {
+         NSLog(@"error %@",error);
+         UIAlertView *alert =[[UIAlertView alloc] initWithTitle:@"Alert" message:[error description] delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+         [alert show];
+     }];
 }
+
+/*-(void)getExpenseItemList
+{
+    NSDictionary *parameters = [NSDictionary dictionaryWithObjectsAndKeys:[Util getUserId], @"ExpenseChildID",expenseObj.ExpenseID, @"ExpenseID", nil];
+    
+    NSString *URL = [BASE_URL stringByAppendingString:[NSString stringWithFormat:@"GetExpenseitems"]];
+    
+    AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
+    manager.responseSerializer = [AFJSONResponseSerializer serializer];
+    
+    [manager GET:URL parameters:parameters success:^(NSURLSessionDataTask *task, id responseObject)
+     {
+         NSLog(@"responseObject = %@", responseObject);
+         NSArray *arrayJSON = (NSArray*)[responseObject valueForKeyPath:@"GetExpenseitemsResult"];
+         
+         for(NSDictionary *obj in arrayJSON)
+         {
+             ExpenseItemObject *expenseItemObj =[[ExpenseItemObject alloc] init];
+             
+             expenseItemObj.ExpenseID = [obj objectForKey:@"ExpenseID"];
+             expenseItemObj.ExpensemasterID = [obj objectForKey:@"ExpensemasterID"];
+             expenseItemObj.Expensename = [obj objectForKey:@"ExpenseID"];
+             expenseItemObj.Notes = [obj objectForKey:@"Notes"];
+             expenseItemObj.ExpenseDate = [obj objectForKey:@"ExpenseID"];
+             expenseItemObj.Amount = [obj objectForKey:@"Amount"];
+             expenseItemObj.AttachmentID = [obj objectForKey:@"AttachmentID"];
+             expenseItemObj.Filename = [obj objectForKey:@"Filename"];
+             
+             [APP_DELEGATE.arrayExpenseItems addObject:expenseItemObj];
+             
+             [self getReceiptImage:expenseItemObj];
+         }
+         
+     } failure:^(NSURLSessionDataTask *task, NSError *error) {
+         NSLog(@"error %@",error);
+         UIAlertView *alert =[[UIAlertView alloc] initWithTitle:@"Alert" message:[error description] delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+         [alert show];
+     }];
+}*/
 
 -(void)getExpenseTypeList
 {
@@ -737,7 +855,7 @@
 
 -(void)creatNewExpenses
 {
-    /*if([btnExpenseSubmissionDate.titleLabel.text isEqualToString:@"     select date"])
+    if([btnExpenseSubmissionDate.titleLabel.text isEqualToString:@"     select date"])
     {
         UIAlertView *alert =[[UIAlertView alloc] initWithTitle:@"Alert" message:@"please select submission date." delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
         [alert show];
@@ -760,7 +878,7 @@
         UIAlertView *alert =[[UIAlertView alloc] initWithTitle:@"Alert" message:@"please enter amount" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
         [alert show];
         return;
-    }*/
+    }
     
     NSDate *submissionDate = [Util convertStringToDate:btnExpenseSubmissionDate.titleLabel.text];
     
@@ -768,24 +886,21 @@
     
     ExpenseObject *expense =[[ExpenseObject alloc] init];
     
-    expense.ClientAddress = @"gurgaon";
-    expense.Amount = [NSNumber numberWithFloat:123.00];//[txtAmount.text floatValue];
-    expense.CategoryName = @"testcat";
-    expense.ClientName = @"dfdfdf";//txtClientName.text;
+    expense.ClientAddress = txtClientAddress.text;
+    expense.Amount = [NSNumber numberWithFloat:[txtAmount.text floatValue]];
+    expense.ClientName = txtClientName.text;
     expense.EmailID = [Util getUserEmailID];
     expense.EmpID = [Util getUserId];
     expense.EmpName = [Util getUserName];
     expense.ExpenseID = [NSNumber numberWithInt:-1];
-    expense.ExpenseNumber = @"1234";
     expense.ExpenseSubmissionDate = [Util convertDateToJsonDate:submissionDate];
     expense.ExpensetypeID = expensetypeID;
     expense.ID = [NSNumber numberWithInt:-1];
-    expense.Name = @"jitendrarec";
-    expense.Notes = @"dsd";//txtDescription.text;
+    //expense.Name = @"jitendrarec";
+    expense.Notes = txtDescription.text;
     expense.Status = [NSNumber numberWithInt:-1];
     
     NSURL *baseURL = [NSURL URLWithString:BASE_URL];
-    //NSURL *baseURL = [NSURL URLWithString:@"http://192.168.1.3:8088/HrmsService.svc/web/"];
     
     AFHTTPSessionManager *manager = [[AFHTTPSessionManager alloc] initWithBaseURL:baseURL];
     manager.requestSerializer = [AFJSONRequestSerializer serializer];
@@ -793,7 +908,7 @@
     manager.responseSerializer = responseSerializer;
     
     [manager POST:@"CreateUpdateExpense" parameters:[expense toNSDictionary] success:^(NSURLSessionDataTask *task, id responseObject) {
-            NSLog(@"responseObject = %@", responseObject);
+            NSLog(@"ExpenseID = %@", responseObject);
             [Util setExpenseId:responseObject];
         /*UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Success"
                                                             message:@"Expense saved successfully"
@@ -825,15 +940,15 @@
     manager.responseSerializer = responseSerializer;
     
     
-    //if([APP_DELEGATE.arrayExpenseItems count] > 0)
+    if([APP_DELEGATE.arrayExpenseItems count] > 0)
     {
-        //for (int i = 0; i < [APP_DELEGATE.arrayExpenseItems count]; i++)
+        for (int i = 0; i < [APP_DELEGATE.arrayExpenseItems count]; i++)
         {
-            ExpenseItemObject *expenseItem = [APP_DELEGATE.arrayExpenseItems objectAtIndex:0];
+            ExpenseItemObject *expenseItem = [APP_DELEGATE.arrayExpenseItems objectAtIndex:i];
             expenseItem.ExpenseID = [Util getExpenseId];
     
             [manager POST:@"CreateExpenseItem" parameters:[expenseItem toNSDictionary] success:^(NSURLSessionDataTask *task, id responseObject) {
-                NSLog(@"responseObject = %@", responseObject);
+                NSLog(@"ExpenseItemID = %@", responseObject);
                 expenseItem.ExpensemasterID = [NSNumber numberWithInt:[responseObject integerValue]];
                 UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Success"
                                                                     message:@"Expense Item saved successfully"
@@ -864,30 +979,27 @@
     AFJSONResponseSerializer *responseSerializer = [AFJSONResponseSerializer serializerWithReadingOptions:NSJSONReadingAllowFragments];
     manager.responseSerializer = responseSerializer;
     
-    
     expenseItemObject.AttachmentID = [NSNumber numberWithInt:-1];
             
-            [manager POST:@"CreateExpenseItemAttachment" parameters:[expenseItemObject toNSDictionary] success:^(NSURLSessionDataTask *task, id responseObject) {
-                NSLog(@"responseObject = %@", responseObject);
-                UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Success"
-                                                                    message:@"Expense Item saved successfully"
-                                                                   delegate:nil
-                                                          cancelButtonTitle:@"Ok"
-                                                          otherButtonTitles:nil];
-                [alertView show];
-                
-                
-                
-            } failure:^(NSURLSessionDataTask *task, NSError *error) {
-                UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Error"
-                                                                    message:[error localizedDescription]
-                                                                   delegate:nil
-                                                          cancelButtonTitle:@"Ok"
-                                                          otherButtonTitles:nil];
-                [alertView show];
-            }];
-    
-    
+    [manager POST:@"CreateExpenseItemAttachment" parameters:[expenseItemObject toNSDictionary] success:^(NSURLSessionDataTask *task, id responseObject) {
+        NSLog(@"AttachmentID = %@", responseObject);
+        UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Success"
+                                                            message:@"Expense Item saved successfully"
+                                                           delegate:nil
+                                                  cancelButtonTitle:@"Ok"
+                                                  otherButtonTitles:nil];
+        [alertView show];
+        
+        
+        
+    } failure:^(NSURLSessionDataTask *task, NSError *error) {
+        UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Error"
+                                                            message:[error localizedDescription]
+                                                           delegate:nil
+                                                  cancelButtonTitle:@"Ok"
+                                                  otherButtonTitles:nil];
+        [alertView show];
+    }];
 }
 
 - (IBAction)textFieldDone:(id)sender

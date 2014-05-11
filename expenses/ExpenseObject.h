@@ -11,9 +11,9 @@
 @interface ExpenseObject : NSObject
 
 @property(nonatomic,strong) NSNumber *EmpID;
-@property(nonatomic,strong) NSNumber * ExpensetypeID;
-@property(nonatomic,strong) NSNumber * ExpenseID;
-@property(nonatomic,strong) NSNumber * Amount;
+@property(nonatomic,strong) NSNumber *ExpensetypeID;
+@property(nonatomic,strong) NSNumber *ExpenseID;
+@property(nonatomic,strong) NSNumber *Amount;
 @property(nonatomic,strong) NSString *ExpenseSubmissionDate;
 @property(nonatomic,strong) NSString *EmailID;
 @property(nonatomic,strong) NSString *ClientName;
