@@ -898,6 +898,7 @@
     AFJSONResponseSerializer *responseSerializer = [AFJSONResponseSerializer serializerWithReadingOptions:NSJSONReadingAllowFragments];
     manager.responseSerializer = responseSerializer;
     
+    [MBProgressHUD showHUDAddedTo:self.view animated:YES];
     
     [manager POST:@"CreateUpdateExpense" parameters:[self.expenseObj toNSDictionary] success:^(NSURLSessionDataTask *task, id responseObject) {
             NSLog(@"ExpenseID = %@", responseObject);
@@ -986,8 +987,6 @@
     AFJSONResponseSerializer *responseSerializer = [AFJSONResponseSerializer serializerWithReadingOptions:NSJSONReadingAllowFragments];
     manager.responseSerializer = responseSerializer;
     
-    expenseItemObject.AttachmentID = [NSNumber numberWithInt:-1];
-    
     [manager POST:@"CreateExpenseItemAttachment" parameters:[expenseItemObject toNSDictionary] success:^(NSURLSessionDataTask *task, id responseObject) {
         NSLog(@"AttachmentID = %@", responseObject);
         UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Success"
@@ -998,6 +997,7 @@
         alertView.tag = 1;
         [alertView show];
         
+        [MBProgressHUD hideAllHUDsForView:self.view animated:YES];
         
         
     } failure:^(NSURLSessionDataTask *task, NSError *error) {
