@@ -14,6 +14,7 @@
 #import "Util.h"
 #import "ExpenseItemObject.h"
 #import "NSData+Base64.h"
+#import "MBProgressHUD.h"
 
 @interface ExpenseDetailsVC ()
 
@@ -35,6 +36,7 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    
 	// Do any additional setup after loading the view.
     expenseTypes = [[NSMutableArray alloc] init];
     dicExpenseTypes = [[NSMutableDictionary alloc]init];
@@ -57,9 +59,9 @@
             ExpenseItemObject *expenseItem = [APP_DELEGATE.arrayExpenseItems objectAtIndex:i];
             sum = sum + [expenseItem.Amount floatValue];
         }
+        
+        txtAmount.text = [NSString stringWithFormat:@"%.2f", sum];
     }
-    
-    txtAmount.text = [NSString stringWithFormat:@"%.2f", sum];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShowNotification:) name:UIKeyboardWillShowNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillHideNotification:) name:UIKeyboardWillHideNotification object:nil];
@@ -267,9 +269,9 @@
         [toolbar setAutoresizingMask:UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleTopMargin];
         
         toolbar.items = [NSArray arrayWithObjects:
-                         [[UIBarButtonItem alloc]initWithTitle:@"Submit" style:UIBarButtonItemStyleDone target:self action:@selector(submit)],
+                         [[UIBarButtonItem alloc]initWithTitle:@"Submit" style:UIBarButtonItemStyleDone target:self action:@selector(submitExpense)],
                          [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil],
-                         [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemSave target:self action:@selector(save)],
+                         [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemSave target:self action:@selector(saveExpense)],
                          nil];
         [toolbar sizeToFit];
         toolbar.tintColor = [UIColor whiteColor];
@@ -352,9 +354,12 @@
     AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
     manager.responseSerializer = [AFJSONResponseSerializer serializer];
     
+    [MBProgressHUD showHUDAddedTo:self.view animated:YES];
+    
     [manager GET:URL parameters:nil success:^(NSURLSessionDataTask *task, id responseObject)
      {
-         NSLog(@"responseObject = %@", responseObject);
+         [MBProgressHUD hideHUDForView:self.view animated:YES];
+         //NSLog(@"responseObject = %@", responseObject);
          
          NSArray *arrayJSON = (NSArray*)[responseObject valueForKeyPath:@"GetPhotoResult"];
          
@@ -379,12 +384,13 @@
          
      } failure:^(NSURLSessionDataTask *task, NSError *error) {
          NSLog(@"error %@",error);
+         [MBProgressHUD hideHUDForView:self.view animated:YES];
          UIAlertView *alert =[[UIAlertView alloc] initWithTitle:@"Alert" message:[error description] delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
          [alert show];
      }];
 }
 
--(void)getReceiptImage:(ExpenseItemObject*)expenseItem
+-(void)getReceiptImage:(ExpenseItemObject*)expenseItem forIndex:(int)index
 {
     NSString *URL = [NSString stringWithFormat:@"%@GetAttachment?AttachmentID=%@",BASE_URL, [expenseItem.AttachmentID stringValue]];
     
@@ -393,7 +399,7 @@
     
     [manager GET:URL parameters:nil success:^(NSURLSessionDataTask *task, id responseObject)
      {
-         NSLog(@"receipt image = %@", responseObject);
+         //NSLog(@"receipt image = %@", responseObject);
          
          NSArray *arrayJSON = (NSArray*)[responseObject valueForKeyPath:@"GetAttachmentResult"];
          
@@ -405,7 +411,7 @@
              UIImage *image = [UIImage imageWithData:data];
              
              UIButton *btnPicture = [UIButton buttonWithType:UIButtonTypeCustom];
-             btnPicture.tag = [expenseItem.AttachmentID integerValue] - 1;
+             btnPicture.tag = index;
              [btnPicture setFrame:CGRectMake(btnPicture.tag * 45 , 0, 40, 40)];
              [btnPicture setImage:image forState:UIControlStateNormal];
              [btnPicture addTarget:self action:@selector(showReceiptDetails:) forControlEvents:UIControlEventTouchUpInside];
@@ -631,7 +637,7 @@
 {
 	[picker dismissViewControllerAnimated:YES completion:nil];
     imagePickerController.view.hidden = YES;
-    [self addReceiptCollectionScrollView];
+    //[self addReceiptCollectionScrollView];
     
     Scan *scan = [[Scan alloc] init];
     scan.title = @"Receipt";
@@ -727,19 +733,18 @@
 {
     if (alertView.tag == 1)
     {
-        [self.navigationController popViewControllerAnimated:TRUE];
+        //[self.navigationController popViewControllerAnimated:TRUE];
     }
 }
 
--(void)save
+-(void)saveExpense
 {
-    [self creatNewExpenses];
+    [self SaveExpenseData:[NSNumber numberWithInt:-1]];
 }
 
--(void)submit
+-(void)submitExpense
 {
-    //[self creatNewExpenses];
-    //[self.navigationController popViewControllerAnimated:TRUE];
+    [self SaveExpenseData:[NSNumber numberWithInt:0]];
 }
 
 -(void)showReceiptDetails:(id) sender
@@ -748,29 +753,44 @@
     Scan *scan = [[Scan alloc] init];
     scan.title = @"Receipt";
     scan.expenseItemIndex = btn.tag;
+    scan.isSubmitted = self.isSubmitted;
     [self.navigationController pushViewController:scan animated:YES];
 }
 
 -(void)getExpenseItemList
 {
-    NSDictionary *parameters = [NSDictionary dictionaryWithObjectsAndKeys:expenseObj.ExpenseID, @"ExpenseID", nil];
+    NSDictionary *parameters = [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithInt:-1], @"ExpenseChildID",expenseObj.ExpenseID, @"ExpenseID", nil];
     
     NSString *URL = [BASE_URL stringByAppendingString:[NSString stringWithFormat:@"GetExpenseitems"]];
     
     AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
     manager.responseSerializer = [AFJSONResponseSerializer serializer];
-    
+ 
     [manager GET:URL parameters:parameters success:^(NSURLSessionDataTask *task, id responseObject)
      {
-         for (int i = 1; i < 6; i++)
+         NSLog(@"responseObject = %@", responseObject);
+         NSArray *arrayJSON = (NSArray*)[responseObject valueForKeyPath:@"GetExpenseitemsResult"];
+         
+         if (arrayJSON != nil && ![arrayJSON isEqual:[NSNull null]])
          {
-             ExpenseItemObject *expenseItemObj =[[ExpenseItemObject alloc] init];
-             
-             expenseItemObj.AttachmentID = [NSNumber numberWithInt:i];
-             
-             [APP_DELEGATE.arrayExpenseItems addObject:expenseItemObj];
-             
-             [self getReceiptImage:expenseItemObj];
+             for(int i = 0; i < [arrayJSON count]; i++)
+             {
+                 NSDictionary *obj = [arrayJSON objectAtIndex:i];
+                 ExpenseItemObject *expenseItemObj =[[ExpenseItemObject alloc] init];
+                 
+                 expenseItemObj.ExpenseID = [obj objectForKey:@"ExpenseID"];
+                 expenseItemObj.ExpensemasterID = [obj objectForKey:@"ExpensemasterID"];
+                 expenseItemObj.Expensename = [obj objectForKey:@"Expensename"];
+                 expenseItemObj.Notes = [obj objectForKey:@"Notes"];
+                 expenseItemObj.ExpenseDate = [Util  deserializeJsonDateString:[obj objectForKey:@"ExpenseDate"]];
+                 expenseItemObj.Amount = [obj objectForKey:@"Amount"];
+                 expenseItemObj.AttachmentID = [obj objectForKey:@"AttachmentID"];
+                 expenseItemObj.Filename = [obj objectForKey:@"Filename"];
+                 
+                 [APP_DELEGATE.arrayExpenseItems addObject:expenseItemObj];
+                 
+                 [self getReceiptImage:expenseItemObj forIndex:i];
+             }
          }
          
      } failure:^(NSURLSessionDataTask *task, NSError *error) {
@@ -779,45 +799,6 @@
          [alert show];
      }];
 }
-
-/*-(void)getExpenseItemList
-{
-    NSDictionary *parameters = [NSDictionary dictionaryWithObjectsAndKeys:[Util getUserId], @"ExpenseChildID",expenseObj.ExpenseID, @"ExpenseID", nil];
-    
-    NSString *URL = [BASE_URL stringByAppendingString:[NSString stringWithFormat:@"GetExpenseitems"]];
-    
-    AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
-    manager.responseSerializer = [AFJSONResponseSerializer serializer];
-    
-    [manager GET:URL parameters:parameters success:^(NSURLSessionDataTask *task, id responseObject)
-     {
-         NSLog(@"responseObject = %@", responseObject);
-         NSArray *arrayJSON = (NSArray*)[responseObject valueForKeyPath:@"GetExpenseitemsResult"];
-         
-         for(NSDictionary *obj in arrayJSON)
-         {
-             ExpenseItemObject *expenseItemObj =[[ExpenseItemObject alloc] init];
-             
-             expenseItemObj.ExpenseID = [obj objectForKey:@"ExpenseID"];
-             expenseItemObj.ExpensemasterID = [obj objectForKey:@"ExpensemasterID"];
-             expenseItemObj.Expensename = [obj objectForKey:@"ExpenseID"];
-             expenseItemObj.Notes = [obj objectForKey:@"Notes"];
-             expenseItemObj.ExpenseDate = [obj objectForKey:@"ExpenseID"];
-             expenseItemObj.Amount = [obj objectForKey:@"Amount"];
-             expenseItemObj.AttachmentID = [obj objectForKey:@"AttachmentID"];
-             expenseItemObj.Filename = [obj objectForKey:@"Filename"];
-             
-             [APP_DELEGATE.arrayExpenseItems addObject:expenseItemObj];
-             
-             [self getReceiptImage:expenseItemObj];
-         }
-         
-     } failure:^(NSURLSessionDataTask *task, NSError *error) {
-         NSLog(@"error %@",error);
-         UIAlertView *alert =[[UIAlertView alloc] initWithTitle:@"Alert" message:[error description] delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
-         [alert show];
-     }];
-}*/
 
 -(void)getExpenseTypeList
 {
@@ -830,12 +811,14 @@
      {
          NSLog(@"responseObject = %@", responseObject);
          NSArray *arrayJSON = (NSArray*)[responseObject valueForKeyPath:@"GetExpensetypesResult"];
-         //NSLog(@"responseObject = %@", [arrayJSON valueForKey:@"ExpenseID"]);
          
-         for(NSDictionary *obj in arrayJSON)
+         if (arrayJSON != nil && ![arrayJSON isEqual:[NSNull null]])
          {
-             [expenseTypes addObject:[obj objectForKey:@"CategoryName"]];
-             [dicExpenseTypes setObject:[obj objectForKey:@"ExpensetypeID"] forKey:[obj objectForKey:@"CategoryName"]];
+             for(NSDictionary *obj in arrayJSON)
+             {
+                 [expenseTypes addObject:[obj objectForKey:@"CategoryName"]];
+                 [dicExpenseTypes setObject:[obj objectForKey:@"ExpensetypeID"] forKey:[obj objectForKey:@"CategoryName"]];
+             }
          }
          
          if(expenseObj != nil)
@@ -845,7 +828,7 @@
              
              [btnTravelType setTitle:key forState:UIControlStateNormal];
          }
-         
+
      } failure:^(NSURLSessionDataTask *task, NSError *error) {
          NSLog(@"error %@",error);
          UIAlertView *alert =[[UIAlertView alloc] initWithTitle:@"Alert" message:[error description] delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
@@ -853,7 +836,7 @@
      }];
 }
 
--(void)creatNewExpenses
+-(void)SaveExpenseData:(NSNumber*)status
 {
     if([btnExpenseSubmissionDate.titleLabel.text isEqualToString:@"     select date"])
     {
@@ -884,21 +867,29 @@
     
     NSNumber *expensetypeID = [dicExpenseTypes objectForKey:btnTravelType.titleLabel.text];
     
-    ExpenseObject *expense =[[ExpenseObject alloc] init];
+    if(self.expenseObj == nil || [self.expenseObj isEqual:[NSNull null]])
+    {
+        self.expenseObj = [[ExpenseObject alloc] init];
+        self.expenseObj.Status = status;
+        self.expenseObj.ExpenseID = [NSNumber numberWithInt:-1];
+    }
+    else
+    {
+        self.expenseObj.Status = status;
+    }
     
-    expense.ClientAddress = txtClientAddress.text;
-    expense.Amount = [NSNumber numberWithFloat:[txtAmount.text floatValue]];
-    expense.ClientName = txtClientName.text;
-    expense.EmailID = [Util getUserEmailID];
-    expense.EmpID = [Util getUserId];
-    expense.EmpName = [Util getUserName];
-    expense.ExpenseID = [NSNumber numberWithInt:-1];
-    expense.ExpenseSubmissionDate = [Util convertDateToJsonDate:submissionDate];
-    expense.ExpensetypeID = expensetypeID;
-    expense.ID = [NSNumber numberWithInt:-1];
+    self.expenseObj.ClientAddress = txtClientAddress.text;
+    self.expenseObj.Amount = [NSNumber numberWithFloat:[txtAmount.text floatValue]];
+    self.expenseObj.ClientName = txtClientName.text;
+    self.expenseObj.EmailID = [Util getUserEmailID];
+    self.expenseObj.EmpID = [Util getUserId];
+    self.expenseObj.EmpName = [Util getUserName];
+    self.expenseObj.ExpenseSubmissionDate = [Util convertDateToJsonDate:submissionDate];
+    self.expenseObj.ExpensetypeID = expensetypeID;
+    self.expenseObj.ID = [NSNumber numberWithInt:-1];
     //expense.Name = @"jitendrarec";
-    expense.Notes = txtDescription.text;
-    expense.Status = [NSNumber numberWithInt:-1];
+    self.expenseObj.Notes = txtDescription.text;
+    
     
     NSURL *baseURL = [NSURL URLWithString:BASE_URL];
     
@@ -907,7 +898,8 @@
     AFJSONResponseSerializer *responseSerializer = [AFJSONResponseSerializer serializerWithReadingOptions:NSJSONReadingAllowFragments];
     manager.responseSerializer = responseSerializer;
     
-    [manager POST:@"CreateUpdateExpense" parameters:[expense toNSDictionary] success:^(NSURLSessionDataTask *task, id responseObject) {
+    
+    [manager POST:@"CreateUpdateExpense" parameters:[self.expenseObj toNSDictionary] success:^(NSURLSessionDataTask *task, id responseObject) {
             NSLog(@"ExpenseID = %@", responseObject);
             [Util setExpenseId:responseObject];
         /*UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Success"
@@ -917,7 +909,7 @@
                                                   otherButtonTitles:nil];
         [alertView show];*/
         
-        [self creatNewExpenseItem];
+        [self saveExpenseItem];
         
         } failure:^(NSURLSessionDataTask *task, NSError *error) {
             UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Error"
@@ -929,35 +921,50 @@
         }];
 }
 
--(void)creatNewExpenseItem
+-(void)saveExpenseItem
 {
     NSURL *baseURL = [NSURL URLWithString:BASE_URL];
-    //NSURL *baseURL = [NSURL URLWithString:@"http://192.168.1.3:8088/HrmsService.svc/web/"];
     
     AFHTTPSessionManager *manager = [[AFHTTPSessionManager alloc] initWithBaseURL:baseURL];
     manager.requestSerializer = [AFJSONRequestSerializer serializer];
     AFJSONResponseSerializer *responseSerializer = [AFJSONResponseSerializer serializerWithReadingOptions:NSJSONReadingAllowFragments];
     manager.responseSerializer = responseSerializer;
     
-    
     if([APP_DELEGATE.arrayExpenseItems count] > 0)
     {
         for (int i = 0; i < [APP_DELEGATE.arrayExpenseItems count]; i++)
         {
             ExpenseItemObject *expenseItem = [APP_DELEGATE.arrayExpenseItems objectAtIndex:i];
+            expenseItem.EmpID = [Util getUserId];
             expenseItem.ExpenseID = [Util getExpenseId];
+            expenseItem.Amount = [NSNumber numberWithFloat:[expenseItem.Amount floatValue]];
+            expenseItem.Description = expenseItem.Notes;
+            expenseItem.FileContentType = @"image/jpeg";
+            expenseItem.FileExtension = @".jpg";
+            
+            
+            if([expenseItem.ExpenseDate isKindOfClass:[NSDate class]])
+            {
+                NSDate *submissionDate = (NSDate*)expenseItem.ExpenseDate;
+            
+                NSDateFormatter *outputFormatter = [[NSDateFormatter alloc] init];
+                [outputFormatter setDateFormat:@"dd-MM-yyyy"];
+                expenseItem.ExpenseDate = [Util convertDateToJsonDate:submissionDate];
+            }
     
             [manager POST:@"CreateExpenseItem" parameters:[expenseItem toNSDictionary] success:^(NSURLSessionDataTask *task, id responseObject) {
                 NSLog(@"ExpenseItemID = %@", responseObject);
                 expenseItem.ExpensemasterID = [NSNumber numberWithInt:[responseObject integerValue]];
-                UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Success"
+                /*UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Success"
                                                                     message:@"Expense Item saved successfully"
                                                                    delegate:nil
                                                           cancelButtonTitle:@"Ok"
                                                           otherButtonTitles:nil];
-                [alertView show];
+                [alertView show];*/
                 
                 [self uploadAttachment:expenseItem];
+                
+                
                 
             } failure:^(NSURLSessionDataTask *task, NSError *error) {
                 UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Error"
@@ -980,14 +987,15 @@
     manager.responseSerializer = responseSerializer;
     
     expenseItemObject.AttachmentID = [NSNumber numberWithInt:-1];
-            
+    
     [manager POST:@"CreateExpenseItemAttachment" parameters:[expenseItemObject toNSDictionary] success:^(NSURLSessionDataTask *task, id responseObject) {
         NSLog(@"AttachmentID = %@", responseObject);
         UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Success"
-                                                            message:@"Expense Item saved successfully"
-                                                           delegate:nil
+                                                            message:@"Expense details saved successfully."
+                                                           delegate:self
                                                   cancelButtonTitle:@"Ok"
                                                   otherButtonTitles:nil];
+        alertView.tag = 1;
         [alertView show];
         
         

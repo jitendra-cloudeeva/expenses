@@ -12,6 +12,7 @@
 #import "AFNetworking.h"
 #import "Util.h"
 #import "ExpenseObject.h"
+#import "MBProgressHUD.h"
 
 @implementation ExpensesListVC
 
@@ -24,18 +25,7 @@
     self.view.backgroundColor = [UIColor colorWithRed:165/255.0f green:217/255.0f blue:235/255.0f alpha:1.0f];
     
     arraySavedExpenses = [[NSMutableArray alloc] init];
-    /*[arraySavedExpenses addObject:@"Trip to Gurgaon"];
-    [arraySavedExpenses addObject:@"Hyderabad Visit"];
-    [arraySavedExpenses addObject:@"USA Office Visit"];
-    [arraySavedExpenses addObject:@"Delhi Office Expenses"];
-    [arraySavedExpenses addObject:@"Bangalore Expenses"];*/
-    
     arraySubmittedExpenses = [[NSMutableArray alloc] init];
-    /*[arraySubmittedExpenses addObject:@"2013 Delhi Office Visit"];
-    [arraySubmittedExpenses addObject:@"2014 USA Visit"];
-    [arraySubmittedExpenses addObject:@"Canada Expenses"];
-    [arraySubmittedExpenses addObject:@"Hyderabad Visit"];
-    [arraySubmittedExpenses addObject:@"Pune Expenses"];*/
     
     tView = [[UITableView alloc] initWithFrame:CGRectMake(0, 0, 320, 480)];
 	tView.delegate = self;
@@ -68,43 +58,48 @@
     AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
     manager.responseSerializer = [AFJSONResponseSerializer serializer];
     
+    [MBProgressHUD showHUDAddedTo:self.view animated:YES];
+    
     [manager GET:URL parameters:parameters success:^(NSURLSessionDataTask *task, id responseObject)
      {
+         [MBProgressHUD hideHUDForView:self.view animated:YES];
          NSLog(@"responseObject = %@", responseObject);
          NSArray *arrayJSON = (NSArray*)[responseObject valueForKeyPath:@"JGetExpensesResult"];
-         NSLog(@"responseObject = %@", [arrayJSON valueForKey:@"ExpenseID"]);
          
-         for(NSDictionary *obj in arrayJSON)
+         if (arrayJSON != nil && ![arrayJSON isEqual:[NSNull null]])
          {
-             ExpenseObject *expense =[[ExpenseObject alloc] init];
-             
-             expense.ClientAddress = [obj objectForKey:@"Address"];
-             expense.Amount= [obj objectForKey:@"Amount"];
-             expense.ClientName = [obj objectForKey:@"ClientName"];
-             expense.EmailID = [obj objectForKey:@"EmailID"];
-             expense.EmpID = [obj objectForKey:@"EmpID"];
-             expense.ExpenseID = [obj objectForKey:@"ExpenseID"];
-             expense.ExpenseNumber = [obj objectForKey:@"ExpenseNumber"];
-             expense.ExpenseSubmissionDate = [Util  deserializeJsonDateString:[obj objectForKey:@"ExpenseSubmissionDate"]];
-             expense.ExpensetypeID = [obj objectForKey:@"ExpensetypeID"];
-             expense.Name = [obj objectForKey:@"Name"];
-             expense.Notes = [obj objectForKey:@"Notes"];
-             expense.Status = [obj objectForKey:@"Status"];
-             
-             if([expense.Status integerValue] > -1)
+             for(NSDictionary *obj in arrayJSON)
              {
-                 [arraySubmittedExpenses addObject:expense];
+                 ExpenseObject *expense =[[ExpenseObject alloc] init];
+                 
+                 expense.ClientAddress = [obj objectForKey:@"ClientAddress"];
+                 expense.Amount= [obj objectForKey:@"Amount"];
+                 expense.ClientName = [obj objectForKey:@"ClientName"];
+                 expense.EmailID = [obj objectForKey:@"EmailID"];
+                 expense.EmpID = [obj objectForKey:@"EmpID"];
+                 expense.ExpenseID = [obj objectForKey:@"ExpenseID"];
+                 expense.ExpenseNumber = [obj objectForKey:@"ExpenseNumber"];
+                 expense.ExpenseSubmissionDate = [Util  deserializeJsonDateString:[obj objectForKey:@"ExpenseSubmissionDate"]];
+                 expense.ExpensetypeID = [obj objectForKey:@"ExpensetypeID"];
+                 expense.Name = [obj objectForKey:@"Name"];
+                 expense.Notes = [obj objectForKey:@"Notes"];
+                 expense.Status = [obj objectForKey:@"Status"];
+                 
+                 if([expense.Status integerValue] > -1)
+                 {
+                     [arraySubmittedExpenses addObject:expense];
+                 }
+                 else
+                 {
+                     [arraySavedExpenses addObject:expense];
+                 }
+                 
+                 [tView reloadData];
              }
-             else
-             {
-                 [arraySavedExpenses addObject:expense];
-             }
-             
-             [tView reloadData];
          }
          
-         
      } failure:^(NSURLSessionDataTask *task, NSError *error) {
+         [MBProgressHUD hideHUDForView:self.view animated:YES];
          NSLog(@"error %@",error);
          UIAlertView *alert =[[UIAlertView alloc] initWithTitle:@"Alert" message:@"Invalid username or password, try again." delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
          [alert show];
@@ -224,6 +219,7 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
+    [APP_DELEGATE.arrayExpenseItems removeAllObjects];
     ExpenseDetailsVC *edvc = [[ExpenseDetailsVC alloc] init];
     
     if (indexPath.section == 0)

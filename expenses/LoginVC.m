@@ -10,6 +10,8 @@
 #import "ExpensesListVC.h"
 #import "AFNetworking.h"
 #import "Util.h"
+#import "MBProgressHUD.h"
+#import "EmployeeObject.h"
 
 @interface LoginVC ()
 
@@ -48,8 +50,6 @@
     txtUsername.delegate = self;
 	[self.view addSubview:txtUsername];
     
-    txtUsername.text = @"vnagaraja";
-    
     label = [[UILabel alloc] initWithFrame:CGRectMake(20, 180, 100, 30)];
 	label.backgroundColor = [UIColor clearColor];
 	label.font = [UIFont systemFontOfSize:16];
@@ -74,8 +74,6 @@
     txtPassword.delegate = self;
     [self.view addSubview:txtPassword];
     
-    txtPassword.text = @"a1a2a3";
-    
     btnLogin = [UIButton buttonWithType:UIButtonTypeCustom];
     //[btnLogin setTitle:@"Login" forState:UIControlStateNormal];
     //[btnLogin setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
@@ -91,21 +89,21 @@
 
 - (void) viewWillAppear:(BOOL)animated;
 {
-    //btnLogin.enabled = FALSE;
+    btnLogin.enabled = FALSE;
 }
 
 - (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string
 {
     if(textField == txtPassword)
     {
-        /*if ([[textField text] length] + [string length] - range.length > 3)
+        if ([[textField text] length] + [string length] - range.length > 3)
         {
             btnLogin.enabled = YES;
         }
         else
         {
             btnLogin.enabled = NO;
-        }*/
+        }
     }
     
     if ([[textField text] length] + [string length] - range.length > 10)
@@ -120,17 +118,30 @@
     return YES;
 }
 
--(void)Login
+/*-(void)Login
 {
     [txtPassword resignFirstResponder];
     
-    NSString *URL = [BASE_URL stringByAppendingString:[NSString stringWithFormat:@"LoginUser/%@/%@", txtUsername.text, txtPassword.text]];
+    EmployeeObject *employee = [[EmployeeObject alloc] initWithCode];
+    employee.username = txtUsername.text;
+    employee.password = txtPassword.text;
     
-    AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
-    manager.responseSerializer = [AFJSONResponseSerializer serializer];
+    NSURL *baseURL = [NSURL URLWithString:BASE_URL];
     
-    [manager GET:URL parameters:nil success:^(NSURLSessionDataTask *task, id responseObject)
+    AFHTTPSessionManager *manager = [[AFHTTPSessionManager alloc] initWithBaseURL:baseURL];
+    manager.requestSerializer = [AFJSONRequestSerializer serializer];
+    AFJSONResponseSerializer *responseSerializer = [AFJSONResponseSerializer serializerWithReadingOptions:NSJSONReadingAllowFragments];
+    manager.responseSerializer = responseSerializer;
+    
+    //NSString *URL = [BASE_URL stringByAppendingString:[NSString stringWithFormat:@"LoginCredentials"]];
+    //AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
+    //manager.responseSerializer = [AFJSONResponseSerializer serializer];
+    
+    [MBProgressHUD showHUDAddedTo:self.view animated:YES];
+    
+    [manager GET:@"LoginCredentials" parameters:[employee toNSDictionary] success:^(NSURLSessionDataTask *task, id responseObject)
     {
+        [MBProgressHUD hideHUDForView:self.view animated:YES];
         NSLog(@"responseObject = %@", responseObject);
         
         if(responseObject == nil || [responseObject isEqual:[NSNull null]])
@@ -154,15 +165,67 @@
         
         txtUsername.text = @"";
         txtPassword.text = @"";
+        
         ExpensesListVC *evc = [[ExpensesListVC alloc] init];
         evc.title = @"Expenses";
         [self.navigationController pushViewController:evc animated:YES];
         
     } failure:^(NSURLSessionDataTask *task, NSError *error) {
+        [MBProgressHUD hideHUDForView:self.view animated:YES];
         NSLog(@"error %@",error);
         UIAlertView *alert =[[UIAlertView alloc] initWithTitle:@"Error" message:@"Network error, can't connect to the server, try again." delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
         [alert show];
     }];
+}*/
+
+-(void)Login
+{
+    [txtPassword resignFirstResponder];
+    
+    NSString *URL = [BASE_URL stringByAppendingString:[NSString stringWithFormat:@"LoginUser/%@/%@", txtUsername.text, txtPassword.text]];
+    
+    AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
+    manager.responseSerializer = [AFJSONResponseSerializer serializer];
+    
+    [MBProgressHUD showHUDAddedTo:self.view animated:YES];
+    
+    [manager GET:URL parameters:nil success:^(NSURLSessionDataTask *task, id responseObject)
+     {
+         [MBProgressHUD hideHUDForView:self.view animated:YES];
+         NSLog(@"responseObject = %@", responseObject);
+         
+         if(responseObject == nil || [responseObject isEqual:[NSNull null]])
+         {
+             UIAlertView *alert =[[UIAlertView alloc] initWithTitle:@"Alert" message:@"Invalid username or password, try again." delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+             [alert show];
+             return;
+         }
+         
+         NSArray *dd = (NSArray*)responseObject;
+         NSDictionary *dicJSON = dd[0];
+         
+         [Util setUserId:[dicJSON objectForKey:@"UserID"]];
+         [Util setUserName:[dicJSON objectForKey:@"Username"]];
+         [Util setEmployeeName:[dicJSON objectForKey:@"Empname"]];
+         [Util setUserEmailID:[dicJSON objectForKey:@"EmailID"]];
+         [Util setUserStatus:[dicJSON objectForKey:@"Ustatus"]];
+         [Util setUserActive:[dicJSON objectForKey:@"Active"]];
+         [Util setUserPhotoId:[dicJSON objectForKey:@"PhotoID"]];
+         [Util setUserPhone:[dicJSON objectForKey:@"cell"]];
+         
+         txtUsername.text = @"";
+         txtPassword.text = @"";
+         
+         ExpensesListVC *evc = [[ExpensesListVC alloc] init];
+         evc.title = @"Expenses";
+         [self.navigationController pushViewController:evc animated:YES];
+         
+     } failure:^(NSURLSessionDataTask *task, NSError *error) {
+         [MBProgressHUD hideHUDForView:self.view animated:YES];
+         NSLog(@"error %@",error);
+         UIAlertView *alert =[[UIAlertView alloc] initWithTitle:@"Error" message:@"Network error, can't connect to the server, try again." delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+         [alert show];
+     }];
 }
 
 - (IBAction)textFieldDone:(id)sender

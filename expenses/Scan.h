@@ -28,6 +28,7 @@
     UIDatePicker *pickerDate;
     UIActionSheet *actionSheet;
     ExpenseItemObject *expenseItemObj;
+    BOOL isSubmitted;
 }
 
 @property(nonatomic,strong)UIImagePickerController *imagePickerController;
@@ -36,6 +37,7 @@
 @property(assign) int expenseItemIndex;
 @property (nonatomic) UIKeyboardType currentKBType;
 @property(nonatomic,strong) UITextField *curTextField;
+@property(assign) BOOL isSubmitted;
 
 
 - (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker;

@@ -33,6 +33,8 @@
 		A38E0F7D191C6AEB00C7AEC2 /* ExpenseItemObject.m in Sources */ = {isa = PBXBuildFile; fileRef = A38E0F7C191C6AEB00C7AEC2 /* ExpenseItemObject.m */; };
 		A38E0F80191D315B00C7AEC2 /* NSData+Base64.m in Sources */ = {isa = PBXBuildFile; fileRef = A38E0F7E191D315B00C7AEC2 /* NSData+Base64.m */; };
 		A38E0F84191E1A1A00C7AEC2 /* person.png in Resources */ = {isa = PBXBuildFile; fileRef = A38E0F83191E1A1A00C7AEC2 /* person.png */; };
+		A38E0F8A1920B43600C7AEC2 /* MBProgressHUD.m in Sources */ = {isa = PBXBuildFile; fileRef = A38E0F891920B43600C7AEC2 /* MBProgressHUD.m */; };
+		A38E0F8E1920F6C900C7AEC2 /* EmployeeObject.m in Sources */ = {isa = PBXBuildFile; fileRef = A38E0F8D1920F6C900C7AEC2 /* EmployeeObject.m */; };
 		A3DBA16C18EA8B86006250EA /* signin.png in Resources */ = {isa = PBXBuildFile; fileRef = A3DBA16B18EA8B86006250EA /* signin.png */; };
 		A3ED0A0318E96ED4001547D2 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A3ED0A0218E96ED4001547D2 /* Foundation.framework */; };
 		A3ED0A0518E96ED4001547D2 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A3ED0A0418E96ED4001547D2 /* CoreGraphics.framework */; };
@@ -115,6 +117,10 @@
 		A38E0F7E191D315B00C7AEC2 /* NSData+Base64.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSData+Base64.m"; sourceTree = "<group>"; };
 		A38E0F7F191D315B00C7AEC2 /* NSData+Base64.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSData+Base64.h"; sourceTree = "<group>"; };
 		A38E0F83191E1A1A00C7AEC2 /* person.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = person.png; sourceTree = "<group>"; };
+		A38E0F881920B43600C7AEC2 /* MBProgressHUD.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MBProgressHUD.h; sourceTree = "<group>"; };
+		A38E0F891920B43600C7AEC2 /* MBProgressHUD.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MBProgressHUD.m; sourceTree = "<group>"; };
+		A38E0F8C1920F6C900C7AEC2 /* EmployeeObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EmployeeObject.h; sourceTree = "<group>"; };
+		A38E0F8D1920F6C900C7AEC2 /* EmployeeObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EmployeeObject.m; sourceTree = "<group>"; };
 		A3DBA16B18EA8B86006250EA /* signin.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = signin.png; sourceTree = "<group>"; };
 		A3ED09FF18E96ED3001547D2 /* expenses.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = expenses.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A3ED0A0218E96ED4001547D2 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -248,10 +254,6 @@
 				A3ED0A3B18E981DA001547D2 /* ExpenseDetailsVC.m */,
 				A3ED0A4318E99338001547D2 /* Scan.h */,
 				A3ED0A4418E99338001547D2 /* Scan.m */,
-				568EB07A190E7D3700FAEE01 /* ExpenseObject.h */,
-				568EB07B190E7D3700FAEE01 /* ExpenseObject.m */,
-				A38E0F7B191C6AEB00C7AEC2 /* ExpenseItemObject.h */,
-				A38E0F7C191C6AEB00C7AEC2 /* ExpenseItemObject.m */,
 			);
 			name = ViewControllers;
 			sourceTree = "<group>";
@@ -261,10 +263,25 @@
 			children = (
 				A38E0F7E191D315B00C7AEC2 /* NSData+Base64.m */,
 				A38E0F7F191D315B00C7AEC2 /* NSData+Base64.h */,
+				A38E0F881920B43600C7AEC2 /* MBProgressHUD.h */,
+				A38E0F891920B43600C7AEC2 /* MBProgressHUD.m */,
 				A374F72719162CDD00C62373 /* Util.h */,
 				A374F72819162CDD00C62373 /* Util.m */,
 			);
 			name = Util;
+			sourceTree = "<group>";
+		};
+		A38E0F8B1920F69500C7AEC2 /* Data Object */ = {
+			isa = PBXGroup;
+			children = (
+				568EB07A190E7D3700FAEE01 /* ExpenseObject.h */,
+				568EB07B190E7D3700FAEE01 /* ExpenseObject.m */,
+				A38E0F8C1920F6C900C7AEC2 /* EmployeeObject.h */,
+				A38E0F8D1920F6C900C7AEC2 /* EmployeeObject.m */,
+				A38E0F7B191C6AEB00C7AEC2 /* ExpenseItemObject.h */,
+				A38E0F7C191C6AEB00C7AEC2 /* ExpenseItemObject.m */,
+			);
+			name = "Data Object";
 			sourceTree = "<group>";
 		};
 		A3ED09F618E96ED3001547D2 = {
@@ -300,6 +317,7 @@
 		A3ED0A0818E96ED4001547D2 /* expenses */ = {
 			isa = PBXGroup;
 			children = (
+				A38E0F8B1920F69500C7AEC2 /* Data Object */,
 				A374F72619162CAD00C62373 /* Util */,
 				56A3D2D4190FC8D000E4D839 /* AFNetworking */,
 				56A3D2E8190FC8D000E4D839 /* UIKit+AFNetworking */,
@@ -454,6 +472,7 @@
 				56A3D305190FC8D000E4D839 /* UIAlertView+AFNetworking.m in Sources */,
 				A3ED0A1318E96ED4001547D2 /* AppDelegate.m in Sources */,
 				56A3D301190FC8D000E4D839 /* AFURLResponseSerialization.m in Sources */,
+				A38E0F8E1920F6C900C7AEC2 /* EmployeeObject.m in Sources */,
 				56A3D306190FC8D000E4D839 /* UIButton+AFNetworking.m in Sources */,
 				A3ED0A3C18E981DA001547D2 /* ExpenseDetailsVC.m in Sources */,
 				A374F72919162CDD00C62373 /* Util.m in Sources */,
@@ -472,6 +491,7 @@
 				56A3D2FD190FC8D000E4D839 /* AFNetworkReachabilityManager.m in Sources */,
 				56A3D307190FC8D000E4D839 /* UIImageView+AFNetworking.m in Sources */,
 				56A3D2FB190FC8D000E4D839 /* AFHTTPRequestOperationManager.m in Sources */,
+				A38E0F8A1920B43600C7AEC2 /* MBProgressHUD.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
