@@ -235,6 +235,14 @@
                          [[UIBarButtonItem alloc]initWithTitle:@"Take Picture" style:UIBarButtonItemStyleDone target:self action:@selector(getPhotoFromCamera)],
                          nil];*/
     }
+    
+    if(self.isSubmitted)
+    {
+        txtExpenseItemName.enabled = FALSE;
+        btnExpenseSubmissionDate.enabled = FALSE;
+        txtAmount.enabled = FALSE;
+        txtDescription.editable = FALSE;
+    }
 }
 
 -(void)ShowExpenseSubmissionDatePicker

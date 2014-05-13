@@ -344,6 +344,15 @@
         [self getExpenseItemList];
     }
     
+    if(self.isSubmitted)
+    {
+        btnExpenseSubmissionDate.enabled = FALSE;
+        txtClientName.enabled = FALSE;
+        txtClientAddress.enabled = FALSE;
+        txtDescription.editable = FALSE;
+        txtAmount.enabled = FALSE;
+    }
+    
     [self getUserPhoto];
 }
 
@@ -358,7 +367,7 @@
     
     [manager GET:URL parameters:nil success:^(NSURLSessionDataTask *task, id responseObject)
      {
-         [MBProgressHUD hideHUDForView:self.view animated:YES];
+         [MBProgressHUD hideAllHUDsForView:self.view animated:YES];
          //NSLog(@"responseObject = %@", responseObject);
          
          NSArray *arrayJSON = (NSArray*)[responseObject valueForKeyPath:@"GetPhotoResult"];
@@ -384,7 +393,7 @@
          
      } failure:^(NSURLSessionDataTask *task, NSError *error) {
          NSLog(@"error %@",error);
-         [MBProgressHUD hideHUDForView:self.view animated:YES];
+         [MBProgressHUD hideAllHUDsForView:self.view animated:YES];
          UIAlertView *alert =[[UIAlertView alloc] initWithTitle:@"Alert" message:[error description] delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
          [alert show];
      }];
@@ -397,8 +406,11 @@
     AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
     manager.responseSerializer = [AFJSONResponseSerializer serializer];
     
+    [MBProgressHUD showHUDAddedTo:self.view animated:YES];
+    
     [manager GET:URL parameters:nil success:^(NSURLSessionDataTask *task, id responseObject)
      {
+         [MBProgressHUD hideAllHUDsForView:self.view animated:YES];
          //NSLog(@"receipt image = %@", responseObject);
          
          NSArray *arrayJSON = (NSArray*)[responseObject valueForKeyPath:@"GetAttachmentResult"];
@@ -419,6 +431,7 @@
          }
          
      } failure:^(NSURLSessionDataTask *task, NSError *error) {
+         [MBProgressHUD hideAllHUDsForView:self.view animated:YES];
          NSLog(@"error %@",error);
          UIAlertView *alert =[[UIAlertView alloc] initWithTitle:@"Alert" message:[error description] delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
          [alert show];
@@ -807,8 +820,11 @@
     AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
     manager.responseSerializer = [AFJSONResponseSerializer serializer];
     
+    [MBProgressHUD showHUDAddedTo:self.view animated:YES];
+    
     [manager GET:URL parameters:nil success:^(NSURLSessionDataTask *task, id responseObject)
      {
+         [MBProgressHUD hideAllHUDsForView:self.view animated:YES];
          NSLog(@"responseObject = %@", responseObject);
          NSArray *arrayJSON = (NSArray*)[responseObject valueForKeyPath:@"GetExpensetypesResult"];
          
@@ -827,9 +843,15 @@
              NSString *key = [temp lastObject];
              
              [btnTravelType setTitle:key forState:UIControlStateNormal];
+             
+             if(self.isSubmitted)
+             {
+                 btnTravelType.enabled = FALSE;
+             }
          }
 
      } failure:^(NSURLSessionDataTask *task, NSError *error) {
+         [MBProgressHUD hideAllHUDsForView:self.view animated:YES];
          NSLog(@"error %@",error);
          UIAlertView *alert =[[UIAlertView alloc] initWithTitle:@"Alert" message:[error description] delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
          [alert show];
