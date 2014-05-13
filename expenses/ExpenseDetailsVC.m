@@ -22,6 +22,12 @@
 
 @implementation ExpenseDetailsVC
 
+static const CGFloat KEYBOARD_ANIMATION_DURATION = 0.3;
+static const CGFloat MINIMUM_SCROLL_FRACTION = 0.2;
+static const CGFloat MAXIMUM_SCROLL_FRACTION = 0.8;
+static const CGFloat PORTRAIT_KEYBOARD_HEIGHT = 216;
+static const CGFloat LANDSCAPE_KEYBOARD_HEIGHT = 162;
+
 @synthesize isSubmitted, currentKBType, curTextField, imagePickerController, isNew, expenseObj, picture;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
@@ -97,12 +103,21 @@
 	label.text = @"Email: ";
     [self.view addSubview:label];
     
-    lblEmail = [[UILabel alloc] initWithFrame:CGRectMake(160, 100, 200, 30)];
+    /*lblEmail = [[UILabel alloc] initWithFrame:CGRectMake(160, 100, 200, 30)];
     lblEmail.backgroundColor = [UIColor clearColor];
 	lblEmail.font = [UIFont systemFontOfSize:12];
 	lblEmail.textColor = [UIColor blackColor];
 	lblEmail.text = [Util getUserEmailID];
-    [self.view addSubview:lblEmail];
+    [self.view addSubview:lblEmail];*/
+    
+    btnEmail = [UIButton buttonWithType:UIButtonTypeCustom];
+    [btnEmail setFrame:CGRectMake(160, 100, 200, 30)];
+    [btnEmail setTitle:[Util getUserEmailID] forState:UIControlStateNormal];
+    [btnEmail setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+    btnEmail.titleLabel.font = [UIFont systemFontOfSize:12];
+    btnEmail.contentHorizontalAlignment = UIControlContentHorizontalAlignmentLeft;
+    [btnEmail addTarget:self action:@selector(sendMail) forControlEvents:UIControlEventTouchUpInside];
+    [self.view addSubview:btnEmail];
     
     label = [[UILabel alloc] initWithFrame:CGRectMake(115, 130, 70, 30)];
 	label.backgroundColor = [UIColor clearColor];
@@ -111,12 +126,21 @@
 	label.text = @"Phone: ";
     [self.view addSubview:label];
     
-    lblPhone = [[UILabel alloc] initWithFrame:CGRectMake(160, 130, 200, 30)];
+    /*lblPhone = [[UILabel alloc] initWithFrame:CGRectMake(160, 130, 200, 30)];
     lblPhone.backgroundColor = [UIColor clearColor];
 	lblPhone.font = [UIFont systemFontOfSize:12];
 	lblPhone.textColor = [UIColor blackColor];
 	lblPhone.text = [Util getUserPhone];
-    [self.view addSubview:lblPhone];
+    [self.view addSubview:lblPhone];*/
+    
+    btnPhone = [UIButton buttonWithType:UIButtonTypeCustom];
+    [btnPhone setFrame:CGRectMake(160, 130, 200, 30)];
+    [btnPhone setTitle:[Util getUserPhone] forState:UIControlStateNormal];
+    [btnPhone setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+    btnPhone.titleLabel.font = [UIFont systemFontOfSize:12];
+    btnPhone.contentHorizontalAlignment = UIControlContentHorizontalAlignmentLeft;
+    [btnPhone addTarget:self action:@selector(makeCall) forControlEvents:UIControlEventTouchUpInside];
+    [self.view addSubview:btnPhone];
     
     label = [[UILabel alloc] initWithFrame:CGRectMake(15, 159, 170, 30)];
 	label.backgroundColor = [UIColor clearColor];
@@ -356,6 +380,59 @@
     [self getUserPhoto];
 }
 
+-(void)sendMail
+{
+    mailComposer = [[MFMailComposeViewController alloc]init];
+    mailComposer.mailComposeDelegate = self;
+    [mailComposer setToRecipients:[NSArray arrayWithObject: [Util getUserEmailID]]];
+    [self presentViewController:mailComposer animated:YES completion:nil];
+}
+
+#pragma mark - mail compose delegate
+- (void) mailComposeController:(MFMailComposeViewController *)controller didFinishWithResult:(MFMailComposeResult)result error:(NSError *)error
+{
+    switch (result)
+    {
+        case MFMailComposeResultCancelled:
+            NSLog(@"Mail cancelled");
+            break;
+        case MFMailComposeResultSaved:
+            NSLog(@"Mail saved");
+            break;
+        case MFMailComposeResultSent:
+            NSLog(@"Mail sent");
+            break;
+        case MFMailComposeResultFailed:
+            NSLog(@"Mail sent failure: %@", [error localizedDescription]);
+            break;
+        default:
+            break;
+    }
+    
+    // Close the Mail Interface
+    [self dismissViewControllerAnimated:YES completion:NULL];
+}
+
+
+-(void)makeCall
+{
+    NSString *phoneNumber = [[[Util getUserPhone] componentsSeparatedByCharactersInSet:[[NSCharacterSet decimalDigitCharacterSet] invertedSet]] componentsJoinedByString:@""];
+    //NSString *phoneNumber = [selectedPhoneNumber stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+    NSLog(@"Phone Number = %@", phoneNumber);
+    NSString *telNo = [NSString stringWithFormat:@"telprompt://%@", phoneNumber];
+    UIDevice *device = [UIDevice currentDevice];
+    
+    if ([[device model] isEqualToString:@"iPhone"] || [[device model] isEqualToString:@"iPad"])
+    {
+        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:telNo]];
+    }
+    else
+    {
+        UIAlertView *Notpermitted=[[UIAlertView alloc] initWithTitle:@"Alert" message:@"Your device doesn't support this feature." delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+        [Notpermitted show];
+    }
+}
+
 -(void)getUserPhoto
 {
     NSString *URL = [NSString stringWithFormat:@"%@GetPhoto?PhotoID=%@",BASE_URL, [[Util getUserPhotoId] stringValue]];
@@ -367,7 +444,7 @@
     
     [manager GET:URL parameters:nil success:^(NSURLSessionDataTask *task, id responseObject)
      {
-         [MBProgressHUD hideAllHUDsForView:self.view animated:YES];
+         [MBProgressHUD hideHUDForView:self.view animated:YES];
          //NSLog(@"responseObject = %@", responseObject);
          
          NSArray *arrayJSON = (NSArray*)[responseObject valueForKeyPath:@"GetPhotoResult"];
@@ -542,11 +619,95 @@
     
     return YES;
 }
--(BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text
+- (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range
+ replacementText:(NSString *)text
 {
-    //[textView resignFirstResponder];
     
+    if ([text isEqualToString:@"\n"]) {
+        
+        [textView resignFirstResponder];
+        // Return FALSE so that the final '\n' character doesn't get added
+        return NO;
+    }
+    // For any other character return TRUE so that the text gets added to the view
     return YES;
+}
+
+- (void)moveUpView:(CGRect)rect forView:(id)controlView
+{
+    CGRect controlViewRect = [self.view.window convertRect:rect fromView:controlView];
+    CGRect viewRect = [self.view.window convertRect:self.view.bounds fromView:self.view];
+    
+    CGFloat midline = controlViewRect.origin.y + 0.5 * controlViewRect.size.height;
+    CGFloat numerator = midline - viewRect.origin.y - MINIMUM_SCROLL_FRACTION * viewRect.size.height;
+    CGFloat denominator = (MAXIMUM_SCROLL_FRACTION - MINIMUM_SCROLL_FRACTION) * viewRect.size.height;
+    CGFloat heightFraction = numerator / denominator;
+    
+    if (heightFraction < 0.0)
+    {
+        heightFraction = 0.0;
+    }
+    else if (heightFraction > 1.0)
+    {
+        heightFraction = 1.0;
+    }
+    
+    UIInterfaceOrientation orientation =
+    [[UIApplication sharedApplication] statusBarOrientation];
+    if (orientation == UIInterfaceOrientationPortrait ||
+        orientation == UIInterfaceOrientationPortraitUpsideDown)
+    {
+        animatedDistance = floor(PORTRAIT_KEYBOARD_HEIGHT * heightFraction);
+    }
+    else
+    {
+        animatedDistance = floor(LANDSCAPE_KEYBOARD_HEIGHT * heightFraction);
+    }
+    
+    CGRect viewFrame = self.view.frame;
+    viewFrame.origin.y -= animatedDistance;
+    
+    [UIView beginAnimations:nil context:NULL];
+    [UIView setAnimationBeginsFromCurrentState:YES];
+    [UIView setAnimationDuration:KEYBOARD_ANIMATION_DURATION];
+    
+    [self.view setFrame:viewFrame];
+    
+    [UIView commitAnimations];
+}
+
+- (void)moveDownView
+{
+    CGRect viewFrame = self.view.frame;
+    viewFrame.origin.y += animatedDistance;
+    
+    [UIView beginAnimations:nil context:NULL];
+    [UIView setAnimationBeginsFromCurrentState:YES];
+    [UIView setAnimationDuration:KEYBOARD_ANIMATION_DURATION];
+    
+    [self.view setFrame:viewFrame];
+    
+    [UIView commitAnimations];
+}
+
+- (void)textFieldDidBeginEditing:(UITextField *)textField
+{
+    [self moveUpView:textField.bounds forView:textField];
+}
+
+- (void)textFieldDidEndEditing:(UITextField *)textField
+{
+    [self moveDownView];
+}
+
+- (void)textViewDidBeginEditing:(UITextView *)textView
+{
+    [self moveUpView:textView.bounds forView:textView];
+}
+
+- (void)textViewDidEndEditing:(UITextView *)textView
+{
+    [self moveDownView];
 }
 
 -(void)showPictureOptions
@@ -820,11 +981,8 @@
     AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
     manager.responseSerializer = [AFJSONResponseSerializer serializer];
     
-    [MBProgressHUD showHUDAddedTo:self.view animated:YES];
-    
     [manager GET:URL parameters:nil success:^(NSURLSessionDataTask *task, id responseObject)
      {
-         [MBProgressHUD hideAllHUDsForView:self.view animated:YES];
          NSLog(@"responseObject = %@", responseObject);
          NSArray *arrayJSON = (NSArray*)[responseObject valueForKeyPath:@"GetExpensetypesResult"];
          
@@ -851,7 +1009,6 @@
          }
 
      } failure:^(NSURLSessionDataTask *task, NSError *error) {
-         [MBProgressHUD hideAllHUDsForView:self.view animated:YES];
          NSLog(@"error %@",error);
          UIAlertView *alert =[[UIAlertView alloc] initWithTitle:@"Alert" message:[error description] delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
          [alert show];

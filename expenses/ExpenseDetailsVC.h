@@ -8,8 +8,9 @@
 
 #import <UIKit/UIKit.h>
 #import "ExpenseObject.h"
+#import <MessageUI/MessageUI.h>
 
-@interface ExpenseDetailsVC : UIViewController<UITextFieldDelegate, UIPickerViewDelegate, UIPickerViewDataSource, UIActionSheetDelegate,UIImagePickerControllerDelegate, UIAlertViewDelegate,UINavigationControllerDelegate,UITextViewDelegate,NSURLSessionTaskDelegate>
+@interface ExpenseDetailsVC : UIViewController<UITextFieldDelegate, UIPickerViewDelegate, UIPickerViewDataSource, UIActionSheetDelegate,UIImagePickerControllerDelegate, UIAlertViewDelegate,UINavigationControllerDelegate,UITextViewDelegate,NSURLSessionTaskDelegate,MFMailComposeViewControllerDelegate>
 {
     UILabel *lblName;
     UILabel *lblEmail;
@@ -40,6 +41,12 @@
     ExpenseObject *expenseObj;
     UIImageView *picture;
     UITextField *txtClientAddress;
+    
+    MFMailComposeViewController *mailComposer;
+    
+    UIButton *btnEmail;
+    UIButton *btnPhone;
+    CGFloat animatedDistance;
 }
 @property (nonatomic, strong) NSURLSessionUploadTask *uploadTask;
 @property (nonatomic) UIKeyboardType currentKBType;

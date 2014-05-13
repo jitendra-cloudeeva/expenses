@@ -35,6 +35,7 @@
 		A38E0F84191E1A1A00C7AEC2 /* person.png in Resources */ = {isa = PBXBuildFile; fileRef = A38E0F83191E1A1A00C7AEC2 /* person.png */; };
 		A38E0F8A1920B43600C7AEC2 /* MBProgressHUD.m in Sources */ = {isa = PBXBuildFile; fileRef = A38E0F891920B43600C7AEC2 /* MBProgressHUD.m */; };
 		A38E0F8E1920F6C900C7AEC2 /* EmployeeObject.m in Sources */ = {isa = PBXBuildFile; fileRef = A38E0F8D1920F6C900C7AEC2 /* EmployeeObject.m */; };
+		A38E0F901922159900C7AEC2 /* MessageUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A38E0F8F1922159900C7AEC2 /* MessageUI.framework */; };
 		A3DBA16C18EA8B86006250EA /* signin.png in Resources */ = {isa = PBXBuildFile; fileRef = A3DBA16B18EA8B86006250EA /* signin.png */; };
 		A3ED0A0318E96ED4001547D2 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A3ED0A0218E96ED4001547D2 /* Foundation.framework */; };
 		A3ED0A0518E96ED4001547D2 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A3ED0A0418E96ED4001547D2 /* CoreGraphics.framework */; };
@@ -121,6 +122,7 @@
 		A38E0F891920B43600C7AEC2 /* MBProgressHUD.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MBProgressHUD.m; sourceTree = "<group>"; };
 		A38E0F8C1920F6C900C7AEC2 /* EmployeeObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EmployeeObject.h; sourceTree = "<group>"; };
 		A38E0F8D1920F6C900C7AEC2 /* EmployeeObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EmployeeObject.m; sourceTree = "<group>"; };
+		A38E0F8F1922159900C7AEC2 /* MessageUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MessageUI.framework; path = System/Library/Frameworks/MessageUI.framework; sourceTree = SDKROOT; };
 		A3DBA16B18EA8B86006250EA /* signin.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = signin.png; sourceTree = "<group>"; };
 		A3ED09FF18E96ED3001547D2 /* expenses.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = expenses.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A3ED0A0218E96ED4001547D2 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -156,6 +158,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A38E0F901922159900C7AEC2 /* MessageUI.framework in Frameworks */,
 				A3ED0A0518E96ED4001547D2 /* CoreGraphics.framework in Frameworks */,
 				A3ED0A0718E96ED4001547D2 /* UIKit.framework in Frameworks */,
 				A3ED0A0318E96ED4001547D2 /* Foundation.framework in Frameworks */,
@@ -306,6 +309,7 @@
 		A3ED0A0118E96ED4001547D2 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				A38E0F8F1922159900C7AEC2 /* MessageUI.framework */,
 				A3ED0A0218E96ED4001547D2 /* Foundation.framework */,
 				A3ED0A0418E96ED4001547D2 /* CoreGraphics.framework */,
 				A3ED0A0618E96ED4001547D2 /* UIKit.framework */,
