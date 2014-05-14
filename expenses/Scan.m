@@ -148,7 +148,9 @@
     
     if(expenseItemIndex > -1)
     {
-        if([expenseItemObj.AttachmentID integerValue] == -1)
+        expenseItemObj = [APP_DELEGATE.arrayExpenseItems objectAtIndex:expenseItemIndex];
+        
+        if([expenseItemObj.ExpensemasterID integerValue] == -1)
         {
             UIBarButtonItem *itemright = [[UIBarButtonItem alloc] initWithTitle:@"Remove" style:UIBarButtonItemStylePlain target:self action:@selector(RemoveImage)];
             self.navigationItem.rightBarButtonItem = itemright;
@@ -162,8 +164,6 @@
             }
         }
         
-        expenseItemObj = [APP_DELEGATE.arrayExpenseItems objectAtIndex:expenseItemIndex];
-        
         if(expenseItemObj.Expensename == nil || [expenseItemObj.Expensename isEqual:[NSNull null]])
         {
             txtExpenseItemName.text = @"";
@@ -173,11 +173,21 @@
             txtExpenseItemName.text = expenseItemObj.Expensename;
         }
         
-        NSDate *submissionDate = (NSDate*)expenseItemObj.ExpenseDate;
-        
         NSDateFormatter *outputFormatter = [[NSDateFormatter alloc] init];
         [outputFormatter setDateFormat:@"dd-MM-yyyy"];
-        [btnExpenseSubmissionDate setTitle:[outputFormatter stringFromDate:submissionDate] forState:UIControlStateNormal];
+        
+        if([expenseItemObj.ExpenseDate isKindOfClass:[NSDate class]])
+        {
+            NSDate *submissionDate = (NSDate*)expenseItemObj.ExpenseDate;
+            [btnExpenseSubmissionDate setTitle:[outputFormatter stringFromDate:submissionDate] forState:UIControlStateNormal];
+        }
+        else
+        {
+            NSDate *date = [Util dateFromDotNet:expenseItemObj.ExpenseDate];
+            
+            NSDate *submissionDate = (NSDate*)date;
+            [btnExpenseSubmissionDate setTitle:[outputFormatter stringFromDate:submissionDate] forState:UIControlStateNormal];
+        }
         
         if(expenseItemObj.Amount == nil || [expenseItemObj.Amount isEqual:[NSNull null]])
         {
@@ -224,6 +234,14 @@
                          [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil],
                          [[UIBarButtonItem alloc]initWithTitle:@"Take Picture" style:UIBarButtonItemStyleDone target:self action:@selector(getPhotoFromCamera)],
                          nil];*/
+    }
+    
+    if(self.isSubmitted)
+    {
+        txtExpenseItemName.enabled = FALSE;
+        btnExpenseSubmissionDate.enabled = FALSE;
+        txtAmount.enabled = FALSE;
+        txtDescription.editable = FALSE;
     }
 }
 
@@ -308,13 +326,20 @@
     
     return YES;
 }
--(BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text
+
+- (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range
+ replacementText:(NSString *)text
 {
-    //[textView resignFirstResponder];
     
+    if ([text isEqualToString:@"\n"]) {
+        
+        [textView resignFirstResponder];
+        // Return FALSE so that the final '\n' character doesn't get added
+        return NO;
+    }
+    // For any other character return TRUE so that the text gets added to the view
     return YES;
 }
-
 
 - (IBAction)textFieldDone:(id)sender
 {
@@ -441,6 +466,7 @@
     {
         expenseItemObj = [[ExpenseItemObject alloc] initWithCode];
         expenseItemObj.ExpensemasterID = [NSNumber numberWithInt:-1];
+        expenseItemObj.AttachmentID = [NSNumber numberWithInt:-1];
     }
     
     expenseItemObj.EmpID = [Util getUserId];
